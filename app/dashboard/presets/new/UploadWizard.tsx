@@ -35,7 +35,19 @@ export function UploadWizard() {
   const router = useRouter()
   const supabase = createClient()
   const [step, setStep] = useState(0)
+  const [maxReached, setMaxReached] = useState(0)
   const [loading, setLoading] = useState(false)
+
+  const goToStep = (i: number) => {
+    if (i <= maxReached) setStep(i)
+  }
+  const nextStep = () => {
+    setStep((s) => {
+      const n = Math.min(STEPS.length - 1, s + 1)
+      setMaxReached((m) => Math.max(m, n))
+      return n
+    })
+  }
   const [error, setError] = useState<string | null>(null)
   const [tagInput, setTagInput] = useState('')
   const [data, setData] = useState<FormData>({
@@ -145,12 +157,17 @@ export function UploadWizard() {
             <React.Fragment key={s}>
               <button
                 type="button"
-                onClick={() => setStep(i)}
-                className="flex items-center gap-2 group focus:outline-none"
-                title={`Go to ${s}`}
+                onClick={() => goToStep(i)}
+                disabled={i > maxReached}
+                className={cn(
+                  'flex items-center gap-2 group focus:outline-none',
+                  i > maxReached ? 'cursor-not-allowed' : 'cursor-pointer'
+                )}
+                title={i > maxReached ? `Complete earlier steps first` : `Go to ${s}`}
               >
                 <div className={cn(
-                  'w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all group-hover:ring-2 group-hover:ring-[#7c5cfc]/40',
+                  'w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all',
+                  i <= maxReached && 'group-hover:ring-2 group-hover:ring-[#7c5cfc]/40',
                   i < step ? 'bg-[#7c5cfc] text-white' :
                   i === step ? 'bg-[#7c5cfc]/20 border-2 border-[#7c5cfc] text-[#7c5cfc]' :
                   'bg-white/5 text-[#888891]'
@@ -159,7 +176,8 @@ export function UploadWizard() {
                 </div>
                 <span className={cn(
                   'text-sm hidden sm:block transition-colors',
-                  i === step ? 'text-[#f0f0f0]' : 'text-[#888891] group-hover:text-[#f0f0f0]'
+                  i === step ? 'text-[#f0f0f0]' :
+                  i <= maxReached ? 'text-[#888891] group-hover:text-[#f0f0f0]' : 'text-[#888891]/50'
                 )}>{s}</span>
               </button>
               {i < STEPS.length - 1 && (
@@ -342,7 +360,7 @@ export function UploadWizard() {
         <div className="flex gap-3">
           {error && <p className="text-sm text-red-400 self-center">{error}</p>}
           {step < STEPS.length - 1 ? (
-            <Button onClick={() => setStep((s) => s + 1)}>
+            <Button onClick={nextStep}>
               Next <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (

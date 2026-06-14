@@ -5,9 +5,12 @@ import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { stripe } from '@/lib/stripe'
 import { formatPrice } from '@/lib/utils'
 import type { Profile } from '@/types/database'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Payouts' }
 
 export default async function PayoutsPage({
@@ -20,7 +23,31 @@ export default async function PayoutsPage({
   if (!user) redirect('/auth/signin?next=/dashboard/payouts')
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-  const seller = profile as Profile | null
+  let seller = profile as Profile | null
+
+  // Reflect the live Stripe account state rather than trusting the return URL.
+  let chargesEnabled = false
+  if (seller?.stripe_account_id) {
+    try {
+      const account = await stripe.accounts.retrieve(seller.stripe_account_id)
+      chargesEnabled = !!account.charges_enabled
+      const liveStatus: Profile['stripe_account_status'] = account.charges_enabled
+        ? 'active'
+        : account.requirements?.disabled_reason
+        ? 'restricted'
+        : 'pending'
+      if (seller.stripe_account_status !== liveStatus) {
+        await createAdminClient()
+          .from('profiles')
+          .update({ stripe_account_status: liveStatus })
+          .eq('id', user.id)
+        seller = { ...seller, stripe_account_status: liveStatus }
+      }
+    } catch {
+      // Stripe unreachable — fall back to stored status.
+    }
+  }
+  const justReturned = searchParams.connected === 'true'
 
   const { data: purchases } = await supabase
     .from('purchases')
@@ -55,10 +82,18 @@ export default async function PayoutsPage({
           <p className="text-[#888891] mt-1">Manage your Stripe Connect account and earnings</p>
         </div>
 
-        {searchParams.connected === 'true' && (
+        {justReturned && chargesEnabled && (
           <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center gap-3">
             <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-            <p className="text-sm text-green-300">Stripe account connected successfully!</p>
+            <p className="text-sm text-green-300">Stripe account connected — payouts are enabled.</p>
+          </div>
+        )}
+        {justReturned && !chargesEnabled && (
+          <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center gap-3">
+            <AlertCircle className="h-5 w-5 text-amber-400 flex-shrink-0" />
+            <p className="text-sm text-amber-300">
+              Stripe onboarding isn&apos;t finished yet. Click &quot;Continue setup&quot; below to complete it before you can receive payouts.
+            </p>
           </div>
         )}
 
@@ -99,9 +134,9 @@ export default async function PayoutsPage({
                 </p>
               </div>
               <a href="/api/stripe/connect/onboard" className="ml-auto">
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant={chargesEnabled ? 'outline' : 'default'}>
                   <ExternalLink className="h-3.5 w-3.5" />
-                  Manage
+                  {chargesEnabled ? 'Manage' : 'Continue setup'}
                 </Button>
               </a>
             </div>
