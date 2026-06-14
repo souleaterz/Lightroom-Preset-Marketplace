@@ -56,6 +56,9 @@ export interface PublishPresetInput {
   additional_demo_pairs: { before: string; after: string }[] | null
   file_path: string
   file_name: string
+  compatible_with: string[] | null
+  whats_included: string | null
+  preset_count: number | null
   is_published: boolean
 }
 
@@ -105,6 +108,9 @@ export async function publishPreset(
       additional_demo_pairs: input.additional_demo_pairs,
       file_path: input.file_path,
       file_name: input.file_name,
+      compatible_with: input.compatible_with,
+      whats_included: input.whats_included,
+      preset_count: input.preset_count,
       is_published: input.is_published,
     })
     .select('id')

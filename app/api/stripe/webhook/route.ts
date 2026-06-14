@@ -4,6 +4,8 @@ import { headers } from 'next/headers'
 import type { Stripe } from 'stripe'
 import { stripe, PLATFORM_FEE_PERCENT } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendPurchaseReceipt, sendSaleNotification } from '@/lib/email'
+import { formatPrice } from '@/lib/utils'
 
 export const runtime = 'nodejs'
 
@@ -49,6 +51,40 @@ export async function POST(request: Request) {
       // Increment seller total_sales
       if (seller_id) {
         await supabase.rpc('increment_seller_sales', { seller_id })
+      }
+
+      // Transactional emails (no-op unless RESEND_API_KEY is set; never blocks).
+      try {
+        const { data: presetRow } = await supabase
+          .from('presets')
+          .select('title')
+          .eq('id', preset_id)
+          .single()
+        const presetTitle = (presetRow?.title as string) || 'your preset'
+
+        const buyerEmail =
+          session.customer_details?.email ||
+          (await supabase.auth.admin.getUserById(buyer_id)).data.user?.email
+        if (buyerEmail) {
+          await sendPurchaseReceipt({
+            to: buyerEmail,
+            presetTitle,
+            amount: formatPrice(amountCents),
+          })
+        }
+
+        if (seller_id) {
+          const sellerEmail = (await supabase.auth.admin.getUserById(seller_id)).data.user?.email
+          if (sellerEmail) {
+            await sendSaleNotification({
+              to: sellerEmail,
+              presetTitle,
+              payout: formatPrice(payoutCents),
+            })
+          }
+        }
+      } catch (err) {
+        console.error('Purchase emails failed:', err)
       }
     }
   }

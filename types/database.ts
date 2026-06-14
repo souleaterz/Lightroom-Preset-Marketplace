@@ -23,6 +23,9 @@ export interface Preset {
   additional_demo_pairs: { before: string; after: string }[] | null
   file_path: string
   file_name: string
+  compatible_with: string[] | null
+  whats_included: string | null
+  preset_count: number | null
   downloads: number
   rating_avg: number
   rating_count: number

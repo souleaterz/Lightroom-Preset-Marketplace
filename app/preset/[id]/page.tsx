@@ -2,7 +2,7 @@ import React from 'react'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Download, FileCode2, Monitor } from 'lucide-react'
+import { Download, FileCode2, Monitor, Layers, Package } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { PresetCard } from '@/components/PresetCard'
 import { Badge } from '@/components/ui/badge'
@@ -131,6 +131,19 @@ export default async function PresetPage({ params }: Props) {
                 <h2 className="text-lg font-semibold text-[#f0f0f0] mb-3">About this preset</h2>
                 <p className="text-[#888891] leading-relaxed whitespace-pre-line">
                   {preset.description}
+                </p>
+              </div>
+            )}
+
+            {/* What's included */}
+            {preset.whats_included && (
+              <div>
+                <h2 className="text-lg font-semibold text-[#f0f0f0] mb-3 flex items-center gap-2">
+                  <Package className="h-5 w-5 text-[#7c5cfc]" />
+                  What&apos;s included
+                </h2>
+                <p className="text-[#888891] leading-relaxed whitespace-pre-line">
+                  {preset.whats_included}
                 </p>
               </div>
             )}
@@ -319,19 +332,27 @@ export default async function PresetPage({ params }: Props) {
                 <PurchaseButton preset={preset} />
               )}
 
+              {/* Pack size */}
+              {preset.preset_count ? (
+                <div className="flex items-center gap-2 text-sm text-[#f0f0f0]">
+                  <Layers className="h-4 w-4 text-[#7c5cfc]" />
+                  <span className="font-medium">{preset.preset_count}</span>
+                  <span className="text-[#888891]">presets in this pack</span>
+                </div>
+              ) : null}
+
               {/* Compatibility */}
               <div className="pt-2 border-t border-white/[0.06] space-y-3">
                 <h3 className="text-xs font-semibold text-[#888891] uppercase tracking-wider">
                   Compatible with
                 </h3>
-                {[
-                  { icon: Monitor, label: 'Lightroom Classic' },
-                  { icon: Monitor, label: 'Lightroom CC' },
-                  { icon: Monitor, label: 'Lightroom Mobile' },
-                ].map(({ icon: Icon, label }) => (
+                {(preset.compatible_with && preset.compatible_with.length > 0
+                  ? preset.compatible_with
+                  : ['Lightroom Classic', 'Lightroom CC', 'Lightroom Mobile']
+                ).map((label) => (
                   <div key={label} className="flex items-center gap-2 text-sm text-[#888891]">
                     <div className="w-5 h-5 rounded bg-white/5 flex items-center justify-center">
-                      <Icon className="h-3 w-3" />
+                      <Monitor className="h-3 w-3" />
                     </div>
                     {label}
                   </div>

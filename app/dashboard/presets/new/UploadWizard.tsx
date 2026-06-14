@@ -18,6 +18,12 @@ import { cn } from '@/lib/utils'
 const STEPS = ['Basics', 'Demo Images', 'Preset File', 'Review & Publish']
 const extOf = (name: string) => name.split('.').pop() || 'dat'
 const CATEGORIES = ['portrait', 'landscape', 'street', 'film', 'moody', 'bright']
+const COMPAT_OPTIONS = [
+  'Lightroom Classic',
+  'Lightroom CC (Desktop)',
+  'Lightroom Mobile',
+  'Photoshop Camera Raw',
+]
 
 interface FormData {
   title: string
@@ -29,6 +35,9 @@ interface FormData {
   afterImage: File | null
   additionalPairs: { before: File | null; after: File | null }[]
   presetFile: File | null
+  compatibleWith: string[]
+  whatsIncluded: string
+  presetCount: string
 }
 
 export function UploadWizard() {
@@ -53,7 +62,17 @@ export function UploadWizard() {
   const [data, setData] = useState<FormData>({
     title: '', description: '', category: 'portrait', tags: [], price: '',
     beforeImage: null, afterImage: null, additionalPairs: [], presetFile: null,
+    compatibleWith: ['Lightroom Classic', 'Lightroom CC (Desktop)', 'Lightroom Mobile'],
+    whatsIncluded: '', presetCount: '',
   })
+
+  const toggleCompat = (opt: string) =>
+    setData((d) => ({
+      ...d,
+      compatibleWith: d.compatibleWith.includes(opt)
+        ? d.compatibleWith.filter((c) => c !== opt)
+        : [...d.compatibleWith, opt],
+    }))
 
   const beforePreviewUrl = data.beforeImage ? URL.createObjectURL(data.beforeImage) : null
   const afterPreviewUrl = data.afterImage ? URL.createObjectURL(data.afterImage) : null
@@ -136,6 +155,9 @@ export function UploadWizard() {
         additional_demo_pairs: additionalPairs.length > 0 ? additionalPairs : null,
         file_path: presetT.path,
         file_name: data.presetFile.name,
+        compatible_with: data.compatibleWith.length > 0 ? data.compatibleWith : null,
+        whats_included: data.whatsIncluded.trim() || null,
+        preset_count: data.presetCount ? parseInt(data.presetCount) : null,
         is_published: !isDraft,
       })
       if (result.error) throw new Error(result.error)
@@ -304,6 +326,64 @@ export function UploadWizard() {
               Single preset files (.xmp / .lrtemplate) or a .zip bundle are both supported. Your file is
               stored securely and only accessible to buyers after purchase.
             </p>
+
+            {/* Pack details */}
+            <div className="pt-4 mt-2 border-t border-white/[0.06] space-y-5">
+              <h3 className="text-sm font-semibold text-[#f0f0f0]">Pack details</h3>
+
+              <div>
+                <Label className="mb-2">Compatible with</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {COMPAT_OPTIONS.map((opt) => {
+                    const checked = data.compatibleWith.includes(opt)
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => toggleCompat(opt)}
+                        className={cn(
+                          'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-left transition-all',
+                          checked
+                            ? 'border-[#7c5cfc]/50 bg-[#7c5cfc]/10 text-[#f0f0f0]'
+                            : 'border-white/10 text-[#888891] hover:border-white/20'
+                        )}
+                      >
+                        <span className={cn(
+                          'w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border',
+                          checked ? 'bg-[#7c5cfc] border-[#7c5cfc]' : 'border-white/20'
+                        )}>
+                          {checked && <Check className="h-3 w-3 text-white" />}
+                        </span>
+                        {opt}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="mb-1.5">Number of presets</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 12"
+                    value={data.presetCount}
+                    onChange={(e) => setData((d) => ({ ...d, presetCount: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label className="mb-1.5">What&apos;s included</Label>
+                <Textarea
+                  rows={3}
+                  placeholder="e.g. 12 .xmp presets, a PDF install guide, and a README"
+                  value={data.whatsIncluded}
+                  onChange={(e) => setData((d) => ({ ...d, whatsIncluded: e.target.value }))}
+                />
+              </div>
+            </div>
           </div>
         )}
 
@@ -328,6 +408,24 @@ export function UploadWizard() {
                 <p className="text-[#888891] mb-0.5">File</p>
                 <p className="text-[#f0f0f0] font-mono text-xs">{data.presetFile?.name || '—'}</p>
               </div>
+              {data.presetCount && (
+                <div>
+                  <p className="text-[#888891] mb-0.5">Presets in pack</p>
+                  <p className="text-[#f0f0f0]">{data.presetCount}</p>
+                </div>
+              )}
+              {data.compatibleWith.length > 0 && (
+                <div className="col-span-2">
+                  <p className="text-[#888891] mb-0.5">Compatible with</p>
+                  <p className="text-[#f0f0f0]">{data.compatibleWith.join(', ')}</p>
+                </div>
+              )}
+              {data.whatsIncluded.trim() && (
+                <div className="col-span-2">
+                  <p className="text-[#888891] mb-0.5">What&apos;s included</p>
+                  <p className="text-[#f0f0f0] whitespace-pre-line">{data.whatsIncluded}</p>
+                </div>
+              )}
             </div>
             {data.beforeImage && data.afterImage && (
               <div>
