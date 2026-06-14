@@ -12,9 +12,11 @@ import { UploadZone } from '@/components/UploadZone'
 import { BeforeAfterSlider } from '@/components/BeforeAfterSlider'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
+import { createUploadTargets, publishPreset } from './actions'
 import { cn } from '@/lib/utils'
 
 const STEPS = ['Basics', 'Demo Images', 'Preset File', 'Review & Publish']
+const extOf = (name: string) => name.split('.').pop() || 'dat'
 const CATEGORIES = ['portrait', 'landscape', 'street', 'film', 'moody', 'bright']
 
 interface FormData {
@@ -29,11 +31,7 @@ interface FormData {
   presetFile: File | null
 }
 
-interface UploadWizardProps {
-  sellerId: string
-}
-
-export function UploadWizard({ sellerId }: UploadWizardProps) {
+export function UploadWizard() {
   const router = useRouter()
   const supabase = createClient()
   const [step, setStep] = useState(0)
@@ -56,14 +54,8 @@ export function UploadWizard({ sellerId }: UploadWizardProps) {
     }
   }
 
-  const uploadImage = async (file: File, bucket: string): Promise<string> => {
-    const ext = file.name.split('.').pop()
-    const path = `${sellerId}/${Date.now()}.${ext}`
-    const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true })
-    if (error) throw error
-    const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(path)
-    return publicUrl
-  }
+  const publicUrl = (bucket: string, path: string) =>
+    supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
 
   const handlePublish = async (isDraft: boolean) => {
     setLoading(true)
@@ -74,43 +66,67 @@ export function UploadWizard({ sellerId }: UploadWizardProps) {
       if (!data.title) throw new Error('Title required')
       if (!data.price || isNaN(parseFloat(data.price))) throw new Error('Valid price required')
 
-      const [beforeUrl, afterUrl] = await Promise.all([
-        uploadImage(data.beforeImage, 'preset-demos'),
-        uploadImage(data.afterImage, 'preset-demos'),
-      ])
+      // 1. Ask the server for signed upload URLs (service role — no RLS issues).
+      const fileList = [
+        { key: 'before', bucket: 'preset-demos', ext: extOf(data.beforeImage.name) },
+        { key: 'after', bucket: 'preset-demos', ext: extOf(data.afterImage.name) },
+        { key: 'preset', bucket: 'preset-files', ext: extOf(data.presetFile.name) },
+      ]
+      data.additionalPairs.forEach((pair, i) => {
+        if (pair.before && pair.after) {
+          fileList.push({ key: `add-${i}-before`, bucket: 'preset-demos', ext: extOf(pair.before.name) })
+          fileList.push({ key: `add-${i}-after`, bucket: 'preset-demos', ext: extOf(pair.after.name) })
+        }
+      })
+
+      const prep = await createUploadTargets(fileList)
+      if (prep.error || !prep.targets) throw new Error(prep.error || 'Could not prepare upload')
+      const targets = prep.targets
+
+      // 2. Upload each file straight to its signed URL.
+      const uploadTo = async (key: string, file: File) => {
+        const t = targets[key]
+        if (!t) throw new Error('Missing upload target')
+        const { error } = await supabase.storage
+          .from(t.bucket)
+          .uploadToSignedUrl(t.path, t.token, file)
+        if (error) throw error
+        return t
+      }
+
+      const beforeT = await uploadTo('before', data.beforeImage)
+      const afterT = await uploadTo('after', data.afterImage)
 
       const additionalPairs: { before: string; after: string }[] = []
-      for (const pair of data.additionalPairs) {
+      for (let i = 0; i < data.additionalPairs.length; i++) {
+        const pair = data.additionalPairs[i]
         if (pair.before && pair.after) {
-          const [b, a] = await Promise.all([
-            uploadImage(pair.before, 'preset-demos'),
-            uploadImage(pair.after, 'preset-demos'),
-          ])
-          additionalPairs.push({ before: b, after: a })
+          const pb = await uploadTo(`add-${i}-before`, pair.before)
+          const pa = await uploadTo(`add-${i}-after`, pair.after)
+          additionalPairs.push({
+            before: publicUrl('preset-demos', pb.path),
+            after: publicUrl('preset-demos', pa.path),
+          })
         }
       }
 
-      const fileExt = data.presetFile.name.split('.').pop()
-      const filePath = `${sellerId}/${Date.now()}.${fileExt}`
-      const { error: fileErr } = await supabase.storage.from('preset-files').upload(filePath, data.presetFile)
-      if (fileErr) throw fileErr
+      const presetT = await uploadTo('preset', data.presetFile)
 
-      const { error: dbErr } = await supabase.from('presets').insert({
-        seller_id: sellerId,
+      // 3. Insert the preset row server-side (seller_id verified server-side).
+      const result = await publishPreset({
         title: data.title,
         description: data.description || null,
         category: data.category,
         tags: data.tags.length > 0 ? data.tags : null,
         price_cents: Math.round(parseFloat(data.price) * 100),
-        before_image_url: beforeUrl,
-        after_image_url: afterUrl,
+        before_image_url: publicUrl('preset-demos', beforeT.path),
+        after_image_url: publicUrl('preset-demos', afterT.path),
         additional_demo_pairs: additionalPairs.length > 0 ? additionalPairs : null,
-        file_path: filePath,
+        file_path: presetT.path,
         file_name: data.presetFile.name,
         is_published: !isDraft,
       })
-
-      if (dbErr) throw dbErr
+      if (result.error) throw new Error(result.error)
 
       router.push('/dashboard/presets')
     } catch (err: unknown) {
@@ -127,9 +143,14 @@ export function UploadWizard({ sellerId }: UploadWizardProps) {
         <div className="flex items-center gap-0">
           {STEPS.map((s, i) => (
             <React.Fragment key={s}>
-              <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setStep(i)}
+                className="flex items-center gap-2 group focus:outline-none"
+                title={`Go to ${s}`}
+              >
                 <div className={cn(
-                  'w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all',
+                  'w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all group-hover:ring-2 group-hover:ring-[#7c5cfc]/40',
                   i < step ? 'bg-[#7c5cfc] text-white' :
                   i === step ? 'bg-[#7c5cfc]/20 border-2 border-[#7c5cfc] text-[#7c5cfc]' :
                   'bg-white/5 text-[#888891]'
@@ -137,10 +158,10 @@ export function UploadWizard({ sellerId }: UploadWizardProps) {
                   {i < step ? <Check className="h-3.5 w-3.5" /> : i + 1}
                 </div>
                 <span className={cn(
-                  'text-sm hidden sm:block',
-                  i === step ? 'text-[#f0f0f0]' : 'text-[#888891]'
+                  'text-sm hidden sm:block transition-colors',
+                  i === step ? 'text-[#f0f0f0]' : 'text-[#888891] group-hover:text-[#f0f0f0]'
                 )}>{s}</span>
-              </div>
+              </button>
               {i < STEPS.length - 1 && (
                 <div className={cn('flex-1 h-0.5 mx-3', i < step ? 'bg-[#7c5cfc]' : 'bg-white/10')} />
               )}
@@ -250,19 +271,20 @@ export function UploadWizard({ sellerId }: UploadWizardProps) {
         {step === 2 && (
           <div className="space-y-4">
             <div>
-              <Label className="mb-2">Preset File (.xmp or .lrtemplate) *</Label>
+              <Label className="mb-2">Preset File *</Label>
               <UploadZone
-                accept=".xmp,.lrtemplate"
+                accept="*"
                 maxSize={50 * 1024 * 1024}
-                label="Drop your preset file here"
-                hint=".xmp or .lrtemplate, up to 50 MB"
+                label="Drop your preset file or .zip here"
+                hint=".xmp, .lrtemplate, or a .zip with multiple files / a README — up to 50 MB"
                 onFile={(f) => setData((d) => ({ ...d, presetFile: f }))}
                 file={data.presetFile}
                 onClear={() => setData((d) => ({ ...d, presetFile: null }))}
               />
             </div>
             <p className="text-xs text-[#888891]">
-              Your preset file is stored securely and only accessible to buyers after purchase.
+              Single preset files (.xmp / .lrtemplate) or a .zip bundle are both supported. Your file is
+              stored securely and only accessible to buyers after purchase.
             </p>
           </div>
         )}

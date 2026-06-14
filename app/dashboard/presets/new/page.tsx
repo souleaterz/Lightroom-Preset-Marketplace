@@ -19,7 +19,7 @@ export default async function NewPresetPage() {
           <h1 className="text-3xl font-semibold text-[#f0f0f0]">Upload New Preset</h1>
           <p className="text-[#888891] mt-1">Complete all steps to publish your preset</p>
         </div>
-        <UploadWizard sellerId={user.id} />
+        <UploadWizard />
       </div>
     </div>
   )

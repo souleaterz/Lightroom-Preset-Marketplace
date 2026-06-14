@@ -31,11 +31,14 @@ export function UploadZone({
 
   const validateAndSet = useCallback((f: File) => {
     setError(null)
-    const ext = f.name.split('.').pop()?.toLowerCase()
-    const allowed = accept.split(',').map((a) => a.trim().replace('.', '').toLowerCase())
-    if (!ext || !allowed.includes(ext)) {
-      setError(`Invalid file type. Allowed: ${accept}`)
-      return
+    const acceptAny = accept.trim() === '*' || accept.trim() === ''
+    if (!acceptAny) {
+      const ext = f.name.split('.').pop()?.toLowerCase()
+      const allowed = accept.split(',').map((a) => a.trim().replace('.', '').toLowerCase())
+      if (!ext || !allowed.includes(ext)) {
+        setError(`Invalid file type. Allowed: ${accept}`)
+        return
+      }
     }
     if (f.size > maxSize) {
       setError(`File too large. Max size: ${Math.round(maxSize / 1024 / 1024)} MB`)
@@ -96,7 +99,7 @@ export function UploadZone({
         <input
           ref={inputRef}
           type="file"
-          accept={accept}
+          accept={accept.trim() === '*' || accept.trim() === '' ? undefined : accept}
           onChange={onInputChange}
           className="hidden"
         />
