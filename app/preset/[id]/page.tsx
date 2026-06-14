@@ -21,11 +21,12 @@ interface Props {
 
 async function getPreset(id: string) {
   const supabase = createClient()
+  // No is_published filter: RLS already restricts to published presets OR the
+  // owner's own (draft) presets, so sellers can preview their drafts.
   const { data } = await supabase
     .from('presets')
-    .select('*, profiles(id, username, display_name, avatar_url, bio, total_sales)')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, bio, total_sales)')
     .eq('id', id)
-    .eq('is_published', true)
     .single()
   return data as Preset | null
 }
@@ -44,7 +45,7 @@ async function getRelated(preset: Preset) {
   const supabase = createClient()
   const { data } = await supabase
     .from('presets')
-    .select('*, profiles(id, username, display_name, avatar_url)')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url)')
     .eq('is_published', true)
     .eq('category', preset.category || '')
     .neq('id', preset.id)

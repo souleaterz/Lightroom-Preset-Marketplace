@@ -7,12 +7,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { createClient } from '@/lib/supabase/client'
+import { updateProfile } from './actions'
 import type { Profile } from '@/types/database'
 
 export function AccountForm({ profile }: { profile: Profile | null }) {
   const router = useRouter()
-  const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -28,18 +27,11 @@ export function AccountForm({ profile }: { profile: Profile | null }) {
     setError(null)
     setSuccess(false)
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        display_name: form.display_name || null,
-        username: form.username.toLowerCase(),
-        bio: form.bio || null,
-      })
-      .eq('id', profile?.id || '')
+    const result = await updateProfile(form)
 
     setLoading(false)
-    if (error) {
-      setError(error.message)
+    if (result.error) {
+      setError(result.error)
     } else {
       setSuccess(true)
       router.refresh()

@@ -18,7 +18,7 @@ async function getPurchases(): Promise<Purchase[]> {
 
   const { data } = await supabase
     .from('purchases')
-    .select('*, presets(id, title, before_image_url, after_image_url, file_name, price_cents, profiles(username, display_name))')
+    .select('*, presets(id, title, before_image_url, after_image_url, file_name, price_cents, profiles!presets_seller_id_fkey(username, display_name))')
     .eq('buyer_id', user.id)
     .eq('status', 'succeeded')
     .order('created_at', { ascending: false })

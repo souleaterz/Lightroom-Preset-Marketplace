@@ -23,7 +23,7 @@ async function getFeaturedPresets(): Promise<Preset[]> {
     const supabase = createClient()
     const { data } = await supabase
       .from('presets')
-      .select('*, profiles(id, username, display_name, avatar_url)')
+      .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url)')
       .eq('is_published', true)
       .order('downloads', { ascending: false })
       .limit(8)

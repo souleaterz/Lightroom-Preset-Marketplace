@@ -17,7 +17,7 @@ export default async function WishlistPage() {
 
   const { data } = await supabase
     .from('wishlists')
-    .select('*, presets(*, profiles(id, username, display_name, avatar_url))')
+    .select('*, presets(*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url))')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 

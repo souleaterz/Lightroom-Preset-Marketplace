@@ -12,7 +12,7 @@ async function getPresets(params: BrowseGridProps['searchParams']): Promise<Pres
     const supabase = createClient()
     let query = supabase
       .from('presets')
-      .select('*, profiles(id, username, display_name, avatar_url)')
+      .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url)')
       .eq('is_published', true)
 
     if (params.category && params.category !== 'all') {
