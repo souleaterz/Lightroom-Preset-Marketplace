@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     // Get preset + seller
     const { data: preset } = await supabase
       .from('presets')
-      .select('*, profiles(id, stripe_account_id, stripe_account_status)')
+      .select('*, profiles!presets_seller_id_fkey(id, stripe_account_id, stripe_account_status)')
       .eq('id', preset_id)
       .eq('is_published', true)
       .single()
