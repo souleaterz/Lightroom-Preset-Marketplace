@@ -35,10 +35,12 @@ async function getFeaturedPresets(): Promise<Preset[]> {
 
 export default async function HomePage() {
   const featuredPresets = await getFeaturedPresets()
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <Navbar user={user} />
 
       {/* Hero */}
       <section className="relative pt-20 pb-28 px-4 overflow-hidden">

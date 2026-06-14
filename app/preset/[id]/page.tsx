@@ -88,9 +88,12 @@ export default async function PresetPage({ params }: Props) {
   const fileExt = preset.file_name.split('.').pop()?.toUpperCase() || 'XMP'
   const demoPairs = preset.additional_demo_pairs || []
 
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <Navbar user={user} />
 
       <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="grid lg:grid-cols-[1fr_380px] gap-10">

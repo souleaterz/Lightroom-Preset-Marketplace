@@ -48,9 +48,12 @@ export default async function SellerPage({ params }: Props) {
       ? presets.reduce((sum, p) => sum + p.rating_avg, 0) / presets.filter((p) => p.rating_count > 0).length || 0
       : 0
 
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <Navbar user={user} />
 
       {/* Hero */}
       <div className="border-b border-white/[0.06] py-12 px-4">

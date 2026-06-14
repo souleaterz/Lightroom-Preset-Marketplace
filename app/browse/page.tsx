@@ -4,17 +4,21 @@ import React, { Suspense } from 'react'
 import { Navbar } from '@/components/Navbar'
 import { FilterSidebar } from '@/components/FilterSidebar'
 import { BrowseGrid } from './BrowseGrid'
+import { createClient } from '@/lib/supabase/server'
 
 export const metadata = { title: 'Browse Presets' }
 
-export default function BrowsePage({
+export default async function BrowsePage({
   searchParams,
 }: {
   searchParams: { [key: string]: string | undefined }
 }) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <Navbar user={user} />
       <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-[#f0f0f0]">Browse Presets</h1>
