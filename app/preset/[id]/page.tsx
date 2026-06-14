@@ -53,6 +53,23 @@ async function getRelated(preset: Preset) {
   return (data as Preset[]) || []
 }
 
+async function getSellerStats(sellerId: string) {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('presets')
+    .select('rating_avg, rating_count')
+    .eq('seller_id', sellerId)
+    .eq('is_published', true)
+  const rows = (data as { rating_avg: number; rating_count: number }[]) || []
+  const totalReviews = rows.reduce((s, r) => s + (r.rating_count || 0), 0)
+  const weighted = rows.reduce((s, r) => s + (r.rating_avg || 0) * (r.rating_count || 0), 0)
+  return {
+    presetCount: rows.length,
+    totalReviews,
+    avg: totalReviews > 0 ? weighted / totalReviews : 0,
+  }
+}
+
 async function getUserPurchase(presetId: string) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -86,6 +103,7 @@ export default async function PresetPage({ params }: Props) {
   if (!preset) notFound()
 
   const related = await getRelated(preset)
+  const sellerStats = preset.seller_id ? await getSellerStats(preset.seller_id) : null
   const fileExt = preset.file_name.split('.').pop()?.toUpperCase() || 'XMP'
   const demoPairs = preset.additional_demo_pairs || []
 
@@ -129,6 +147,78 @@ export default async function PresetPage({ params }: Props) {
                       </Badge>
                     </Link>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* About the author */}
+            {preset.profiles && (
+              <div>
+                <h2 className="text-lg font-semibold text-[#f0f0f0] mb-3">About the author</h2>
+                <div className="bg-[#111114] border border-white/[0.08] rounded-2xl p-6">
+                  <div className="flex items-start gap-4">
+                    <Link
+                      href={`/seller/${preset.profiles.username}`}
+                      className="w-14 h-14 rounded-full bg-[#7c5cfc]/20 border border-[#7c5cfc]/30 flex items-center justify-center overflow-hidden flex-shrink-0"
+                    >
+                      {preset.profiles.avatar_url ? (
+                        <Image
+                          src={preset.profiles.avatar_url}
+                          alt={preset.profiles.display_name || preset.profiles.username}
+                          width={56}
+                          height={56}
+                          className="w-full h-full object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        <span className="text-lg font-semibold text-[#7c5cfc]">
+                          {(preset.profiles.display_name || preset.profiles.username)[0].toUpperCase()}
+                        </span>
+                      )}
+                    </Link>
+                    <div className="flex-1 min-w-0">
+                      <Link
+                        href={`/seller/${preset.profiles.username}`}
+                        className="font-semibold text-[#f0f0f0] hover:text-[#7c5cfc] transition-colors"
+                      >
+                        {preset.profiles.display_name || preset.profiles.username}
+                      </Link>
+                      <p className="text-xs text-[#888891]">@{preset.profiles.username}</p>
+
+                      {/* Author rating + stats */}
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm">
+                        {sellerStats && sellerStats.totalReviews > 0 && (
+                          <span className="flex items-center gap-1.5">
+                            <StarRating value={Math.round(sellerStats.avg)} size="sm" />
+                            <span className="text-[#888891]">
+                              {sellerStats.avg.toFixed(1)} ({sellerStats.totalReviews} review{sellerStats.totalReviews === 1 ? '' : 's'})
+                            </span>
+                          </span>
+                        )}
+                        {sellerStats && (
+                          <span className="text-[#888891]">
+                            {sellerStats.presetCount} preset{sellerStats.presetCount === 1 ? '' : 's'}
+                          </span>
+                        )}
+                        {typeof preset.profiles.total_sales === 'number' && preset.profiles.total_sales > 0 && (
+                          <span className="text-[#888891]">{preset.profiles.total_sales} sales</span>
+                        )}
+                      </div>
+
+                      {preset.profiles.bio && (
+                        <p className="text-sm text-[#888891] leading-relaxed mt-3 whitespace-pre-line">
+                          {preset.profiles.bio}
+                        </p>
+                      )}
+
+                      <Link
+                        href={`/seller/${preset.profiles.username}`}
+                        className="inline-block text-sm text-[#7c5cfc] hover:underline mt-3"
+                      >
+                        View profile →
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

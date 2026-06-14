@@ -1,25 +1,71 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Save, Camera } from 'lucide-react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { updateProfile } from './actions'
+import { createClient } from '@/lib/supabase/client'
+import { updateProfile, createAvatarUploadUrl } from './actions'
 import type { Profile } from '@/types/database'
 
 export function AccountForm({ profile }: { profile: Profile | null }) {
   const router = useRouter()
+  const supabase = createClient()
+  const fileRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
+  const [avatarUploading, setAvatarUploading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(profile?.avatar_url || null)
   const [form, setForm] = useState({
     display_name: profile?.display_name || '',
     username: profile?.username || '',
     bio: profile?.bio || '',
   })
+
+  const initial = (form.display_name || form.username || '?').trim()[0]?.toUpperCase() || '?'
+
+  const handleAvatarPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setError('Please choose an image file.')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Avatar must be 5 MB or smaller.')
+      return
+    }
+    setError(null)
+    setAvatarUploading(true)
+    try {
+      const ext = file.name.split('.').pop() || 'jpg'
+      const target = await createAvatarUploadUrl(ext)
+      if (target.error || !target.bucket || !target.path || !target.token) {
+        throw new Error(target.error || 'Could not prepare upload')
+      }
+      const { error: upErr } = await supabase.storage
+        .from(target.bucket)
+        .uploadToSignedUrl(target.path, target.token, file)
+      if (upErr) throw upErr
+      const url = supabase.storage.from(target.bucket).getPublicUrl(target.path).data.publicUrl
+      // Cache-bust so the new image shows immediately.
+      const busted = `${url}?v=${Date.now()}`
+      setAvatarUrl(busted)
+      // Persist right away so it sticks even if they don't hit Save.
+      await updateProfile({ ...form, avatar_url: busted })
+      router.refresh()
+    } catch (err: unknown) {
+      setError((err as Error).message)
+    } finally {
+      setAvatarUploading(false)
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,7 +73,7 @@ export function AccountForm({ profile }: { profile: Profile | null }) {
     setError(null)
     setSuccess(false)
 
-    const result = await updateProfile(form)
+    const result = await updateProfile({ ...form, avatar_url: avatarUrl })
 
     setLoading(false)
     if (result.error) {
@@ -42,6 +88,38 @@ export function AccountForm({ profile }: { profile: Profile | null }) {
     <form onSubmit={handleSave} className="space-y-6">
       <div className="bg-[#111114] border border-white/[0.08] rounded-2xl p-6 space-y-5">
         <h2 className="font-semibold text-[#f0f0f0]">Profile</h2>
+
+        {/* Avatar */}
+        <div className="flex items-center gap-4">
+          <div className="w-20 h-20 rounded-full bg-[#7c5cfc]/20 border border-[#7c5cfc]/30 flex items-center justify-center overflow-hidden flex-shrink-0">
+            {avatarUrl ? (
+              <Image src={avatarUrl} alt="Avatar" width={80} height={80} className="w-full h-full object-cover" unoptimized />
+            ) : (
+              <span className="text-2xl font-semibold text-[#7c5cfc]">{initial}</span>
+            )}
+          </div>
+          <div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarPick}
+              className="hidden"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={avatarUploading}
+              onClick={() => fileRef.current?.click()}
+            >
+              {avatarUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+              {avatarUploading ? 'Uploading…' : 'Upload avatar'}
+            </Button>
+            <p className="text-xs text-[#888891] mt-1.5">JPG, PNG or WebP, max 5 MB.</p>
+          </div>
+        </div>
+
         <div>
           <Label htmlFor="display_name" className="mb-1.5">Display Name</Label>
           <Input

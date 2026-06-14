@@ -7,6 +7,7 @@ export async function updateProfile(input: {
   display_name: string
   username: string
   bio: string
+  avatar_url?: string | null
 }): Promise<{ success?: true; error?: string }> {
   const supabase = createClient()
   const {
@@ -36,9 +37,31 @@ export async function updateProfile(input: {
       username,
       display_name: input.display_name.trim() || null,
       bio: input.bio.trim() || null,
+      ...(input.avatar_url !== undefined ? { avatar_url: input.avatar_url } : {}),
     },
     { onConflict: 'id' }
   )
   if (error) return { error: error.message }
   return { success: true }
+}
+
+/**
+ * Signed upload URL for the current user's avatar, so the browser can upload
+ * directly to the public `avatars` bucket without hitting storage RLS.
+ */
+export async function createAvatarUploadUrl(
+  ext: string
+): Promise<{ bucket?: string; path?: string; token?: string; error?: string }> {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: 'You must be signed in.' }
+
+  const safeExt = (ext || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || 'jpg'
+  const path = `${user.id}/${Date.now()}.${safeExt}`
+  const admin = createAdminClient()
+  const { data, error } = await admin.storage.from('avatars').createSignedUploadUrl(path)
+  if (error || !data) return { error: error?.message || 'Could not prepare avatar upload.' }
+  return { bucket: 'avatars', path: data.path, token: data.token }
 }
