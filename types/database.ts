@@ -6,6 +6,7 @@ export interface Profile {
   avatar_url: string | null
   stripe_account_id: string | null
   stripe_account_status: 'pending' | 'active' | 'restricted' | null
+  fee_waiver_until: string | null
   total_sales: number
   created_at: string
 }

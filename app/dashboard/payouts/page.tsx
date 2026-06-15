@@ -1,6 +1,6 @@
 import React from 'react'
 import { redirect } from 'next/navigation'
-import { CheckCircle, AlertCircle, Clock, ExternalLink } from 'lucide-react'
+import { CheckCircle, AlertCircle, Clock, ExternalLink, Sparkles } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -48,6 +48,10 @@ export default async function PayoutsPage({
     }
   }
   const justReturned = searchParams.connected === 'true'
+
+  // New-creator fee-free window.
+  const feeFreeActive = !!seller?.fee_waiver_until && new Date(seller.fee_waiver_until).getTime() > Date.now()
+  const feeFreeUntil = seller?.fee_waiver_until ? new Date(seller.fee_waiver_until) : null
 
   const { data: purchases } = await supabase
     .from('purchases')
@@ -143,15 +147,28 @@ export default async function PayoutsPage({
           )}
         </div>
 
+        {/* Fee-free window for new creators */}
+        {feeFreeActive && feeFreeUntil && (
+          <div className="mb-6 p-4 bg-[#7c5cfc]/10 border border-[#7c5cfc]/25 rounded-xl flex items-center gap-3">
+            <Sparkles className="h-5 w-5 text-[#7c5cfc] flex-shrink-0" />
+            <p className="text-sm text-[#cbb9ff]">
+              <strong className="text-[#f0f0f0]">Fee-free month active.</strong> You keep 100% of every
+              sale until {feeFreeUntil.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.
+            </p>
+          </div>
+        )}
+
         {/* Earnings summary */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="bg-[#111114] border border-white/[0.08] rounded-xl p-5">
-            <p className="text-sm text-[#888891] mb-2">Total Earned (85%)</p>
+            <p className="text-sm text-[#888891] mb-2">Total Earned ({feeFreeActive ? '100' : '92'}%)</p>
             <p className="font-mono text-2xl font-bold text-[#f0f0f0]">{formatPrice(totalEarned)}</p>
           </div>
           <div className="bg-[#111114] border border-white/[0.08] rounded-xl p-5">
             <p className="text-sm text-[#888891] mb-2">Platform Fee</p>
-            <p className="font-mono text-2xl font-bold text-[#888891]">15%</p>
+            <p className="font-mono text-2xl font-bold text-[#888891]">
+              {feeFreeActive ? '0%' : '8%'}
+            </p>
           </div>
         </div>
 

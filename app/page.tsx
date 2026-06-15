@@ -230,12 +230,16 @@ export default async function HomePage() {
         <div className="max-w-5xl mx-auto">
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#7c5cfc]/20 to-[#e05c7a]/10 border border-[#7c5cfc]/20 p-10 md:p-14 text-center">
             <Compass className="h-10 w-10 text-[#7c5cfc] mx-auto mb-6" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#7c5cfc]/15 border border-[#7c5cfc]/30 text-xs font-medium text-[#7c5cfc] mb-5">
+              <Sparkles className="h-3.5 w-3.5" />
+              Founding creators: 0% fees for your first month
+            </div>
             <h2 className="text-3xl md:text-4xl font-semibold text-[#f0f0f0] mb-4">
               Turn your style into income
             </h2>
             <p className="text-[#888891] text-lg max-w-xl mx-auto mb-8">
-              List your presets, set your own price, and keep 85% of every sale. Free to join —
-              we&apos;re looking for our first creators.
+              List your presets, set your own price, and keep 92% of every sale. Free to join —
+              and your first month is completely fee-free.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/auth/signup">
@@ -244,7 +248,7 @@ export default async function HomePage() {
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <div className="text-sm text-[#888891]">Free to list · 85% revenue share</div>
+              <div className="text-sm text-[#888891]">Free to list · 92% revenue share</div>
             </div>
           </div>
         </div>

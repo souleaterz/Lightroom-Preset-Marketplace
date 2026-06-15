@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     // Get preset + seller
     const { data: preset } = await supabase
       .from('presets')
-      .select('*, profiles!presets_seller_id_fkey(id, stripe_account_id, stripe_account_status)')
+      .select('*, profiles!presets_seller_id_fkey(id, stripe_account_id, stripe_account_status, fee_waiver_until)')
       .eq('id', preset_id)
       .eq('is_published', true)
       .single()
@@ -41,9 +41,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Already purchased' }, { status: 400 })
     }
 
-    const seller = (preset as Record<string, unknown> & { profiles?: { stripe_account_id?: string; stripe_account_status?: string } }).profiles
+    const seller = (preset as Record<string, unknown> & {
+      profiles?: { stripe_account_id?: string; stripe_account_status?: string; fee_waiver_until?: string | null }
+    }).profiles
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const feeAmount = Math.round(preset.price_cents * (PLATFORM_FEE_PERCENT / 100))
+
+    // New creators are fee-free during their waiver window.
+    const feeFree = !!seller?.fee_waiver_until && new Date(seller.fee_waiver_until).getTime() > Date.now()
+    const feeAmount = feeFree ? 0 : Math.round(preset.price_cents * (PLATFORM_FEE_PERCENT / 100))
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
@@ -59,16 +64,18 @@ export async function POST(request: Request) {
         preset_id: preset.id,
         buyer_id: user.id,
         seller_id: preset.seller_id,
+        platform_fee_cents: String(feeAmount),
       },
       success_url: `${siteUrl}/preset/${preset.id}?purchased=true`,
       cancel_url: `${siteUrl}/preset/${preset.id}`,
     }
 
-    // Add Stripe Connect transfer if seller has active account
+    // Add Stripe Connect transfer if seller has active account.
+    // Omit application_fee_amount entirely when fee-free (Stripe rejects 0).
     if (seller?.stripe_account_id && seller?.stripe_account_status === 'active') {
       sessionParams.payment_intent_data = {
-        application_fee_amount: feeAmount,
         transfer_data: { destination: seller.stripe_account_id },
+        ...(feeAmount > 0 ? { application_fee_amount: feeAmount } : {}),
       }
     }
 

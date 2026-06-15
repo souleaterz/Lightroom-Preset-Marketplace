@@ -117,5 +117,16 @@ export async function publishPreset(
     .single()
 
   if (error) return { error: error.message }
+
+  // Start the new-creator fee-free window on first publish (only sets it once).
+  if (input.is_published) {
+    const waiverUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    await admin
+      .from('profiles')
+      .update({ fee_waiver_until: waiverUntil })
+      .eq('id', user.id)
+      .is('fee_waiver_until', null)
+  }
+
   return { id: data.id as string }
 }

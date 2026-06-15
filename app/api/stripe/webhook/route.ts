@@ -33,7 +33,11 @@ export async function POST(request: Request) {
 
     if (preset_id && buyer_id && session.payment_status === 'paid') {
       const amountCents = session.amount_total || 0
-      const feeCents = Math.round(amountCents * (PLATFORM_FEE_PERCENT / 100))
+      // Prefer the exact fee computed at checkout (accounts for fee-free creators).
+      const feeCents =
+        session.metadata?.platform_fee_cents != null
+          ? parseInt(session.metadata.platform_fee_cents, 10)
+          : Math.round(amountCents * (PLATFORM_FEE_PERCENT / 100))
       const payoutCents = amountCents - feeCents
 
       await supabase.from('purchases').upsert({
