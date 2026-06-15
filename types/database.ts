@@ -36,6 +36,7 @@ export interface Preset {
   rating_avg: number
   rating_count: number
   is_published: boolean
+  new_release_notified?: boolean
   created_at: string
   profiles?: Profile
 }
@@ -73,6 +74,12 @@ export interface DiscountCode {
   times_used: number
   expires_at: string | null
   is_active: boolean
+  created_at: string
+}
+
+export interface Follow {
+  follower_id: string
+  seller_id: string
   created_at: string
 }
 

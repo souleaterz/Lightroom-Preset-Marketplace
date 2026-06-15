@@ -55,6 +55,32 @@ export async function sendPurchaseReceipt(opts: {
   }
 }
 
+/** New-release notification sent to a seller's follower. Never throws. */
+export async function sendNewReleaseEmail(opts: {
+  to: string
+  sellerName: string
+  presetTitle: string
+  presetId: string
+}): Promise<void> {
+  const resend = getResend()
+  if (!resend) return
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: opts.to,
+      subject: `${opts.sellerName} just released ${opts.presetTitle}`,
+      html: shell(
+        'New preset from a creator you follow ✨',
+        `<p><strong style="color:#f0f0f0;">${opts.sellerName}</strong> just published <strong style="color:#f0f0f0;">${opts.presetTitle}</strong>.</p>
+         <p>Be among the first to grab it.</p>
+         ${button(`${SITE}/preset/${opts.presetId}`, 'View the preset')}`
+      ),
+    })
+  } catch (err) {
+    console.error('sendNewReleaseEmail failed:', err)
+  }
+}
+
 /** Sale notification sent to the seller. Never throws. */
 export async function sendSaleNotification(opts: {
   to: string

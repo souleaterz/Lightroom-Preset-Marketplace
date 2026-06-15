@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Download, Star, Package } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { PresetCard } from '@/components/PresetCard'
+import { FollowButton } from '@/components/FollowButton'
 import { createClient } from '@/lib/supabase/server'
 import type { Preset, Profile } from '@/types/database'
 
@@ -51,6 +52,24 @@ export default async function SellerPage({ params }: Props) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Follower count + whether the current user already follows this seller.
+  const { count: followerCount } = await supabase
+    .from('follows')
+    .select('*', { count: 'exact', head: true })
+    .eq('seller_id', seller.id)
+
+  let isFollowing = false
+  if (user && user.id !== seller.id) {
+    const { data: follow } = await supabase
+      .from('follows')
+      .select('seller_id')
+      .eq('follower_id', user.id)
+      .eq('seller_id', seller.id)
+      .maybeSingle()
+    isFollowing = !!follow
+  }
+  const isOwnProfile = user?.id === seller.id
+
   return (
     <div className="min-h-screen">
       <Navbar user={user} />
@@ -91,6 +110,22 @@ export default async function SellerPage({ params }: Props) {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Follow */}
+          <div className="flex-shrink-0">
+            {isOwnProfile ? (
+              <span className="text-sm text-muted">
+                {followerCount || 0} follower{followerCount === 1 ? '' : 's'}
+              </span>
+            ) : (
+              <FollowButton
+                sellerId={seller.id}
+                isSignedIn={!!user}
+                initialFollowing={isFollowing}
+                initialCount={followerCount || 0}
+              />
+            )}
           </div>
         </div>
       </div>

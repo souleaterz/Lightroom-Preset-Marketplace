@@ -20,17 +20,18 @@ ordered roughly by impact-to-effort. Shipped items move to the bottom.
   Buy panel; validated + priced server-side in `/api/checkout` (seller absorbs the
   discount, fee taken on amount paid); usage recorded atomically in the webhook via
   `redeem_discount_code`. Shared logic in `lib/discounts.ts`.
+- **Follow sellers + new-release emails** — `follows` table (migration `0007`,
+  public follow graph) + `presets.new_release_notified` guard. Follow button on
+  seller pages (`components/FollowButton.tsx`); publishing a preset blasts followers
+  once via `notifyFollowersOfNewRelease` in the publish actions + `sendNewReleaseEmail`
+  (Resend). *Follow-up:* publishing via the dashboard eye-toggle (`PresetActions`)
+  doesn't email — only the upload wizard's publish/update does.
 
 ---
 
 ## Next up (high impact)
 
-### 1. Follow sellers + new-release emails
-Users follow a seller; get an email when they publish.
-- `follows` table (follower_id, seller_id). Reuse `lib/email.ts` (Resend).
-- Trigger on publish in `publishPreset` / `updatePreset`.
-
-### 2. Curated collections / staff picks
+### 1. Curated collections / staff picks
 Editorial pages ("Best Moody Film Presets") — strong SEO + authority.
 - `collections` + `collection_presets` tables, simple `/collections/[slug]` route.
 
@@ -38,29 +39,29 @@ Editorial pages ("Best Moody Film Presets") — strong SEO + authority.
 
 ## Trust & marketplace health
 
-### 3. Verified / top-seller badges
+### 2. Verified / top-seller badges
 Badge for sellers with 50+ sales & 4.5★+. Surfaced on cards and seller pages.
 
-### 4. License clarity (personal vs commercial)
+### 3. License clarity (personal vs commercial)
 Per-listing license type; optional higher-priced commercial tier.
 
 ---
 
 ## Bigger swings
 
-### 5. Style quiz / preset finder
+### 4. Style quiz / preset finder
 5-question interactive flow → recommended presets. Shareable, high conversion.
 
-### 6. "Shot with this preset" gallery
+### 5. "Shot with this preset" gallery
 Buyers upload edited photos to the product page. Social proof.
 
-### 7. Subscription access pass
+### 6. Subscription access pass
 £X/month for a rotating library (Envato Elements model). Predictable MRR.
 
-### 8. Try before you buy
+### 7. Try before you buy
 Apply a preset to a user-uploaded photo server-side. Major differentiator.
 
-### 9. LUTs / video presets
+### 8. LUTs / video presets
 Expand into Premiere / DaVinci LUTs — same audience, doubles catalog.
 
 ---

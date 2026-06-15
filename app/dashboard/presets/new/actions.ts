@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendNewReleaseEmail } from '@/lib/email'
 
 export interface UploadTargetRequest {
   key: string
@@ -121,6 +122,7 @@ export async function publishPreset(
   // Start the new-creator fee-free window on first publish (only sets it once).
   if (input.is_published) {
     await startFeeWaiver(admin, user.id)
+    await notifyFollowersOfNewRelease(admin, user.id, data.id as string, input.title)
   }
 
   return { id: data.id as string }
@@ -171,9 +173,52 @@ export async function updatePreset(
 
   if (input.is_published) {
     await startFeeWaiver(admin, user.id)
+    await notifyFollowersOfNewRelease(admin, user.id, input.id, input.title)
   }
 
   return { id: input.id }
+}
+
+/**
+ * Email a seller's followers about a newly published preset. Each preset only
+ * ever blasts once — the atomic flag flip below guards against republishing or
+ * re-editing sending duplicates. Never throws (publishing must not depend on it).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function notifyFollowersOfNewRelease(admin: any, sellerId: string, presetId: string, presetTitle: string) {
+  try {
+    // Atomically claim the one-and-only notification for this preset.
+    const { data: claimed } = await admin
+      .from('presets')
+      .update({ new_release_notified: true })
+      .eq('id', presetId)
+      .eq('new_release_notified', false)
+      .select('id')
+      .maybeSingle()
+    if (!claimed) return // already notified
+
+    const { data: followers } = await admin
+      .from('follows')
+      .select('follower_id')
+      .eq('seller_id', sellerId)
+    if (!followers || followers.length === 0) return
+
+    const { data: seller } = await admin
+      .from('profiles')
+      .select('display_name, username')
+      .eq('id', sellerId)
+      .single()
+    const sellerName = seller?.display_name || seller?.username || 'A creator you follow'
+
+    for (const f of followers as { follower_id: string }[]) {
+      const email = (await admin.auth.admin.getUserById(f.follower_id)).data.user?.email
+      if (email) {
+        await sendNewReleaseEmail({ to: email, sellerName, presetTitle, presetId })
+      }
+    }
+  } catch (err) {
+    console.error('notifyFollowersOfNewRelease failed:', err)
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

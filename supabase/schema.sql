@@ -41,6 +41,7 @@ create table if not exists presets (
   rating_avg numeric(3,2) default 0,
   rating_count integer default 0,
   is_published boolean default false,
+  new_release_notified boolean default false,
   created_at timestamptz default now()
 );
 
@@ -83,6 +84,15 @@ create table if not exists reviews (
   unique(buyer_id, preset_id)
 );
 
+-- Follows (buyers follow sellers; new-release email notifications)
+create table if not exists follows (
+  follower_id uuid references profiles(id) on delete cascade,
+  seller_id uuid references profiles(id) on delete cascade,
+  created_at timestamptz default now(),
+  primary key (follower_id, seller_id)
+);
+create index if not exists idx_follows_seller on follows(seller_id);
+
 -- Wishlists
 create table if not exists wishlists (
   user_id uuid references profiles(id),
@@ -98,6 +108,7 @@ alter table purchases enable row level security;
 alter table reviews enable row level security;
 alter table wishlists enable row level security;
 alter table discount_codes enable row level security;
+alter table follows enable row level security;
 
 -- Profiles
 create policy "Public profiles are viewable by everyone" on profiles for select using (true);
@@ -127,6 +138,11 @@ create policy "Users can delete from own wishlist" on wishlists for delete using
 -- Discount codes (sellers manage own; checkout validates via service role)
 create policy "Sellers manage own discount codes" on discount_codes
   for all using (seller_id = auth.uid()) with check (seller_id = auth.uid());
+
+-- Follows (public follow graph; users manage their own)
+create policy "Follows are viewable by everyone" on follows for select using (true);
+create policy "Users can follow" on follows for insert with check (follower_id = auth.uid());
+create policy "Users can unfollow" on follows for delete using (follower_id = auth.uid());
 
 -- Helper functions
 create or replace function redeem_discount_code(code_id uuid)
