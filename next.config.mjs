@@ -18,7 +18,12 @@ const nextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000'],
+      allowedOrigins: [
+        'localhost:3000',
+        'presetscout.com',
+        'www.presetscout.com',
+        'lightroom-preset-marketplace.vercel.app',
+      ],
     },
   },
 }
