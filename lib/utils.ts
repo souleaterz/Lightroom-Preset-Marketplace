@@ -31,3 +31,8 @@ export function truncate(str: string, length: number): string {
   if (str.length <= length) return str
   return str.slice(0, length) + '…'
 }
+
+/** Demo/sample presets are stored under a "demo/" path and aren't for sale. */
+export function isDemoPreset(preset: { file_path?: string | null }): boolean {
+  return !!preset.file_path && preset.file_path.startsWith('demo/')
+}

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Star, Heart } from 'lucide-react'
-import { cn, formatPrice } from '@/lib/utils'
+import { cn, formatPrice, isDemoPreset } from '@/lib/utils'
 import type { Preset } from '@/types/database'
 
 interface PresetCardProps {
@@ -16,6 +16,7 @@ interface PresetCardProps {
 export function PresetCard({ preset, onQuickPreview, className }: PresetCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isWishlisted, setIsWishlisted] = useState(false)
+  const demo = isDemoPreset(preset)
 
   return (
     <div
@@ -46,6 +47,18 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
             isHovered ? 'opacity-100' : 'opacity-0'
           )}
         />
+
+        {/* Demo watermark */}
+        {demo && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+            <span
+              className="font-extrabold tracking-[0.2em] text-white/75 text-4xl -rotate-12 select-none"
+              style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}
+            >
+              DEMO
+            </span>
+          </div>
+        )}
 
         {/* Before/After labels */}
         <div className={cn(

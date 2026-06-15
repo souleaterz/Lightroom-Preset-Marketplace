@@ -28,6 +28,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Preset not found' }, { status: 404 })
     }
 
+    if (typeof preset.file_path === 'string' && preset.file_path.startsWith('demo/')) {
+      return NextResponse.json({ error: 'This is a demo preset and is not for sale.' }, { status: 400 })
+    }
+
     // Check not already purchased
     const { data: existing } = await supabase
       .from('purchases')

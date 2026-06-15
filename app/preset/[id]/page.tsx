@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { StarRating } from '@/components/StarRating'
 import { createClient } from '@/lib/supabase/server'
-import { formatPrice, formatDate } from '@/lib/utils'
+import { formatPrice, formatDate, isDemoPreset } from '@/lib/utils'
 import type { Preset, Review, Purchase } from '@/types/database'
 import { PurchaseButton } from './PurchaseButton'
 import { ReviewSection } from './ReviewSection'
@@ -106,6 +106,7 @@ export default async function PresetPage({ params }: Props) {
   const sellerStats = preset.seller_id ? await getSellerStats(preset.seller_id) : null
   const fileExt = preset.file_name.split('.').pop()?.toUpperCase() || 'XMP'
   const demoPairs = preset.additional_demo_pairs || []
+  const demo = isDemoPreset(preset)
 
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -119,11 +120,23 @@ export default async function PresetPage({ params }: Props) {
           {/* Left: slider + demos + reviews */}
           <div className="space-y-8">
             {/* Before/after slider */}
-            <DemoGalleryClient
-              mainBefore={preset.before_image_url}
-              mainAfter={preset.after_image_url}
-              additionalPairs={demoPairs}
-            />
+            <div className="relative">
+              <DemoGalleryClient
+                mainBefore={preset.before_image_url}
+                mainAfter={preset.after_image_url}
+                additionalPairs={demoPairs}
+              />
+              {demo && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+                  <span
+                    className="font-extrabold tracking-[0.25em] text-white/70 text-6xl sm:text-7xl -rotate-12 select-none"
+                    style={{ textShadow: '0 2px 20px rgba(0,0,0,0.6)' }}
+                  >
+                    DEMO
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* Description */}
             {preset.description && (
@@ -316,7 +329,16 @@ export default async function PresetPage({ params }: Props) {
               </div>
 
               {/* CTA */}
-              {userPurchase ? (
+              {demo ? (
+                <div className="space-y-2">
+                  <Button className="w-full" size="lg" disabled>
+                    Demo preset — not for sale
+                  </Button>
+                  <p className="text-xs text-center text-[#888891]">
+                    A sample listing showcasing how presets appear on PresetScout.
+                  </p>
+                </div>
+              ) : userPurchase ? (
                 <div className="space-y-3">
                   <a href={`/api/download/${userPurchase.id}`}>
                     <Button className="w-full" size="lg">
