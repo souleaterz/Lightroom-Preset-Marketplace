@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import type { Stripe } from 'stripe'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { stripe, PLATFORM_FEE_PERCENT } from '@/lib/stripe'
+import { validateDiscount } from '@/lib/discounts'
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +13,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { preset_id } = await request.json()
+    const { preset_id, code } = await request.json()
     if (!preset_id) {
       return NextResponse.json({ error: 'preset_id required' }, { status: 400 })
     }
@@ -54,9 +56,24 @@ export async function POST(request: Request) {
     }).profiles
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
+    // Re-validate any discount code server-side (never trust the client price).
+    // The seller absorbs the discount; the platform fee is taken on the actual
+    // amount paid.
+    let unitAmount = preset.price_cents
+    let discountCodeId: string | null = null
+    if (code) {
+      const admin = createAdminClient()
+      const discount = await validateDiscount(admin, preset.seller_id, code, preset.price_cents)
+      if (discount.error) {
+        return NextResponse.json({ error: discount.error }, { status: 400 })
+      }
+      unitAmount = discount.discountedCents!
+      discountCodeId = discount.code!.id
+    }
+
     // New creators are fee-free during their waiver window.
     const feeFree = !!seller?.fee_waiver_until && new Date(seller.fee_waiver_until).getTime() > Date.now()
-    const feeAmount = feeFree ? 0 : Math.round(preset.price_cents * (PLATFORM_FEE_PERCENT / 100))
+    const feeAmount = feeFree ? 0 : Math.round(unitAmount * (PLATFORM_FEE_PERCENT / 100))
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
@@ -64,7 +81,7 @@ export async function POST(request: Request) {
         price_data: {
           currency: 'gbp',
           product_data: { name: preset.title },
-          unit_amount: preset.price_cents,
+          unit_amount: unitAmount,
         },
         quantity: 1,
       }],
@@ -73,6 +90,7 @@ export async function POST(request: Request) {
         buyer_id: user.id,
         seller_id: preset.seller_id,
         platform_fee_cents: String(feeAmount),
+        ...(discountCodeId ? { discount_code_id: discountCodeId } : {}),
       },
       success_url: `${siteUrl}/preset/${preset.id}?purchased=true`,
       cancel_url: `${siteUrl}/preset/${preset.id}`,

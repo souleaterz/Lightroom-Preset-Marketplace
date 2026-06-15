@@ -15,23 +15,22 @@ ordered roughly by impact-to-effort. Shipped items move to the bottom.
   (migration `0005_bundles.sql`, file fields now nullable). Created at
   `/dashboard/bundles/new`; reuses checkout; download serves each member file via
   `/api/download/[purchaseId]?preset=<id>`. Shows savings vs buying individually.
-  *Follow-up:* no bundle editor yet — Edit is hidden for bundles (publish/delete work).
+- **Discount / promo codes** — `discount_codes` table (migration `0006`), seller-wide
+  percentage codes managed at `/dashboard/codes`. Buyers apply at checkout via the
+  Buy panel; validated + priced server-side in `/api/checkout` (seller absorbs the
+  discount, fee taken on amount paid); usage recorded atomically in the webhook via
+  `redeem_discount_code`. Shared logic in `lib/discounts.ts`.
 
 ---
 
 ## Next up (high impact)
 
-### 1. Discount / promo codes
-Seller-defined codes (e.g. 20% off). Sellers promote their own codes → free traffic.
-- `discount_codes` table (seller_id, code, percent_off, expires_at, max_uses).
-- Apply in `/api/checkout` via Stripe `discounts`.
-
-### 3. Follow sellers + new-release emails
+### 1. Follow sellers + new-release emails
 Users follow a seller; get an email when they publish.
 - `follows` table (follower_id, seller_id). Reuse `lib/email.ts` (Resend).
 - Trigger on publish in `publishPreset` / `updatePreset`.
 
-### 4. Curated collections / staff picks
+### 2. Curated collections / staff picks
 Editorial pages ("Best Moody Film Presets") — strong SEO + authority.
 - `collections` + `collection_presets` tables, simple `/collections/[slug]` route.
 
@@ -39,34 +38,36 @@ Editorial pages ("Best Moody Film Presets") — strong SEO + authority.
 
 ## Trust & marketplace health
 
-### 5. Verified / top-seller badges
+### 3. Verified / top-seller badges
 Badge for sellers with 50+ sales & 4.5★+. Surfaced on cards and seller pages.
 
-### 6. License clarity (personal vs commercial)
+### 4. License clarity (personal vs commercial)
 Per-listing license type; optional higher-priced commercial tier.
 
 ---
 
 ## Bigger swings
 
-### 7. Style quiz / preset finder
+### 5. Style quiz / preset finder
 5-question interactive flow → recommended presets. Shareable, high conversion.
 
-### 8. "Shot with this preset" gallery
+### 6. "Shot with this preset" gallery
 Buyers upload edited photos to the product page. Social proof.
 
-### 9. Subscription access pass
+### 7. Subscription access pass
 £X/month for a rotating library (Envato Elements model). Predictable MRR.
 
-### 10. Try before you buy
+### 8. Try before you buy
 Apply a preset to a user-uploaded photo server-side. Major differentiator.
 
-### 11. LUTs / video presets
+### 9. LUTs / video presets
 Expand into Premiere / DaVinci LUTs — same audience, doubles catalog.
 
 ---
 
 ## Known follow-ups / debt
+- **Bundle editor** — bundles can be created, published/unpublished and deleted, but
+  their contents can't be edited after creation (Edit is hidden for bundles in
+  `PresetActions`). Build an editor reusing `BundleCreator` for in-place changes.
 - Affiliate **payouts** are tracked but not yet paid out (Stripe Connect transfers).
-- Pending DB migrations must be applied to live Supabase (see repo migrations,
-  now including `0004_free_presets.sql`).
+- Pending DB migrations must be applied to live Supabase (see repo migrations).

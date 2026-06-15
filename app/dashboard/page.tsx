@@ -1,7 +1,7 @@
 import React from 'react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { TrendingUp, DollarSign, Package, AlertCircle, Plus } from 'lucide-react'
+import { TrendingUp, DollarSign, Package, AlertCircle, Plus, Tag } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -84,12 +84,20 @@ export default async function DashboardPage() {
             <h1 className="text-3xl font-semibold text-foreground">Dashboard</h1>
             <p className="text-muted mt-1">Welcome back, {seller?.display_name || seller?.username}</p>
           </div>
-          <Link href="/dashboard/presets/new">
-            <Button>
-              <Plus className="h-4 w-4" />
-              New Preset
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/codes">
+              <Button variant="outline">
+                <Tag className="h-4 w-4" />
+                Discount Codes
+              </Button>
+            </Link>
+            <Link href="/dashboard/presets/new">
+              <Button>
+                <Plus className="h-4 w-4" />
+                New Preset
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Stripe Connect banner */}

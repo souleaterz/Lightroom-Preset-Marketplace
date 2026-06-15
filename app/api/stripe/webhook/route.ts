@@ -49,6 +49,11 @@ export async function POST(request: Request) {
         status: 'succeeded',
       }, { onConflict: 'stripe_payment_intent_id', ignoreDuplicates: false })
 
+      // Record discount-code usage (atomic, capped) if one was applied.
+      if (session.metadata?.discount_code_id) {
+        await supabase.rpc('redeem_discount_code', { code_id: session.metadata.discount_code_id })
+      }
+
       // Increment download count on preset
       await supabase.rpc('increment_downloads', { preset_id })
 

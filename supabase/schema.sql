@@ -56,6 +56,21 @@ create table if not exists purchases (
   created_at timestamptz default now()
 );
 
+-- Discount codes (seller-defined, percentage off all their presets)
+create table if not exists discount_codes (
+  id uuid primary key default gen_random_uuid(),
+  seller_id uuid references profiles(id) on delete cascade,
+  code text not null,
+  percent_off integer not null check (percent_off between 1 and 100),
+  max_uses integer,
+  times_used integer default 0,
+  expires_at timestamptz,
+  is_active boolean default true,
+  created_at timestamptz default now(),
+  unique (seller_id, code)
+);
+create index if not exists idx_discount_codes_seller on discount_codes(seller_id);
+
 -- Reviews
 create table if not exists reviews (
   id uuid primary key default gen_random_uuid(),
@@ -82,6 +97,7 @@ alter table presets enable row level security;
 alter table purchases enable row level security;
 alter table reviews enable row level security;
 alter table wishlists enable row level security;
+alter table discount_codes enable row level security;
 
 -- Profiles
 create policy "Public profiles are viewable by everyone" on profiles for select using (true);
@@ -108,7 +124,27 @@ create policy "Users can view own wishlist" on wishlists for select using (auth.
 create policy "Users can manage own wishlist" on wishlists for insert with check (auth.uid() = user_id);
 create policy "Users can delete from own wishlist" on wishlists for delete using (auth.uid() = user_id);
 
+-- Discount codes (sellers manage own; checkout validates via service role)
+create policy "Sellers manage own discount codes" on discount_codes
+  for all using (seller_id = auth.uid()) with check (seller_id = auth.uid());
+
 -- Helper functions
+create or replace function redeem_discount_code(code_id uuid)
+returns boolean language plpgsql security definer as $$
+declare
+  ok boolean;
+begin
+  update discount_codes
+    set times_used = times_used + 1
+    where id = code_id
+      and is_active = true
+      and (max_uses is null or times_used < max_uses)
+      and (expires_at is null or expires_at > now())
+    returning true into ok;
+  return coalesce(ok, false);
+end;
+$$;
+
 create or replace function increment_downloads(preset_id uuid)
 returns void language plpgsql security definer as $$
 begin

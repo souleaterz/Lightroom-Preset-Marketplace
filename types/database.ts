@@ -64,6 +64,18 @@ export interface Review {
   profiles?: Profile
 }
 
+export interface DiscountCode {
+  id: string
+  seller_id: string
+  code: string
+  percent_off: number
+  max_uses: number | null
+  times_used: number
+  expires_at: string | null
+  is_active: boolean
+  created_at: string
+}
+
 export interface Wishlist {
   user_id: string
   preset_id: string
