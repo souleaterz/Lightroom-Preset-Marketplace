@@ -120,13 +120,68 @@ export async function publishPreset(
 
   // Start the new-creator fee-free window on first publish (only sets it once).
   if (input.is_published) {
-    const waiverUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-    await admin
-      .from('profiles')
-      .update({ fee_waiver_until: waiverUntil })
-      .eq('id', user.id)
-      .is('fee_waiver_until', null)
+    await startFeeWaiver(admin, user.id)
   }
 
   return { id: data.id as string }
+}
+
+/** Update an existing preset the signed-in user owns (used for drafts & edits). */
+export async function updatePreset(
+  input: PublishPresetInput & { id: string }
+): Promise<{ id?: string; error?: string }> {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: 'You must be signed in.' }
+
+  const admin = createAdminClient()
+
+  // Ownership check.
+  const { data: owned } = await admin
+    .from('presets')
+    .select('id')
+    .eq('id', input.id)
+    .eq('seller_id', user.id)
+    .maybeSingle()
+  if (!owned) return { error: 'Preset not found.' }
+
+  const { error } = await admin
+    .from('presets')
+    .update({
+      title: input.title,
+      description: input.description,
+      category: input.category,
+      tags: input.tags,
+      price_cents: input.price_cents,
+      before_image_url: input.before_image_url,
+      after_image_url: input.after_image_url,
+      additional_demo_pairs: input.additional_demo_pairs,
+      file_path: input.file_path,
+      file_name: input.file_name,
+      compatible_with: input.compatible_with,
+      whats_included: input.whats_included,
+      preset_count: input.preset_count,
+      is_published: input.is_published,
+    })
+    .eq('id', input.id)
+
+  if (error) return { error: error.message }
+
+  if (input.is_published) {
+    await startFeeWaiver(admin, user.id)
+  }
+
+  return { id: input.id }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function startFeeWaiver(admin: any, userId: string) {
+  const waiverUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+  await admin
+    .from('profiles')
+    .update({ fee_waiver_until: waiverUntil })
+    .eq('id', userId)
+    .is('fee_waiver_until', null)
 }

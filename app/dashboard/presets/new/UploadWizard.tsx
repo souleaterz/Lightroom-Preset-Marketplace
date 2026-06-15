@@ -12,8 +12,9 @@ import { UploadZone } from '@/components/UploadZone'
 import { BeforeAfterSlider } from '@/components/BeforeAfterSlider'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
-import { createUploadTargets, publishPreset } from './actions'
+import { createUploadTargets, publishPreset, updatePreset } from './actions'
 import { cn } from '@/lib/utils'
+import type { Preset } from '@/types/database'
 
 const STEPS = ['Basics', 'Demo Images', 'Preset File', 'Review & Publish']
 const extOf = (name: string) => name.split('.').pop() || 'dat'
@@ -40,12 +41,38 @@ interface FormData {
   presetCount: string
 }
 
-export function UploadWizard() {
+export function UploadWizard({ existing }: { existing?: Preset }) {
   const router = useRouter()
   const supabase = createClient()
+  const isEdit = !!existing
+
   const [step, setStep] = useState(0)
-  const [maxReached, setMaxReached] = useState(0)
+  // In edit mode every step is already reachable.
+  const [maxReached, setMaxReached] = useState(isEdit ? STEPS.length - 1 : 0)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [tagInput, setTagInput] = useState('')
+
+  // Files already stored for this preset (edit mode) — kept unless replaced.
+  const existingBefore = existing?.before_image_url ?? null
+  const existingAfter = existing?.after_image_url ?? null
+  const existingFile = existing ? { name: existing.file_name, path: existing.file_path } : null
+  const existingAdditional = existing?.additional_demo_pairs ?? []
+
+  const [data, setData] = useState<FormData>({
+    title: existing?.title ?? '',
+    description: existing?.description ?? '',
+    category: existing?.category ?? 'portrait',
+    tags: existing?.tags ?? [],
+    price: existing ? (existing.price_cents / 100).toString() : '',
+    beforeImage: null,
+    afterImage: null,
+    additionalPairs: [],
+    presetFile: null,
+    compatibleWith: existing?.compatible_with ?? ['Lightroom Classic', 'Lightroom CC (Desktop)', 'Lightroom Mobile'],
+    whatsIncluded: existing?.whats_included ?? '',
+    presetCount: existing?.preset_count ? String(existing.preset_count) : '',
+  })
 
   const goToStep = (i: number) => {
     if (i <= maxReached) setStep(i)
@@ -57,25 +84,10 @@ export function UploadWizard() {
       return n
     })
   }
-  const [error, setError] = useState<string | null>(null)
-  const [tagInput, setTagInput] = useState('')
-  const [data, setData] = useState<FormData>({
-    title: '', description: '', category: 'portrait', tags: [], price: '',
-    beforeImage: null, afterImage: null, additionalPairs: [], presetFile: null,
-    compatibleWith: ['Lightroom Classic', 'Lightroom CC (Desktop)', 'Lightroom Mobile'],
-    whatsIncluded: '', presetCount: '',
-  })
 
-  const toggleCompat = (opt: string) =>
-    setData((d) => ({
-      ...d,
-      compatibleWith: d.compatibleWith.includes(opt)
-        ? d.compatibleWith.filter((c) => c !== opt)
-        : [...d.compatibleWith, opt],
-    }))
-
-  const beforePreviewUrl = data.beforeImage ? URL.createObjectURL(data.beforeImage) : null
-  const afterPreviewUrl = data.afterImage ? URL.createObjectURL(data.afterImage) : null
+  // Effective preview URLs (newly picked file wins, else the stored image).
+  const beforePreviewUrl = data.beforeImage ? URL.createObjectURL(data.beforeImage) : existingBefore
+  const afterPreviewUrl = data.afterImage ? URL.createObjectURL(data.afterImage) : existingAfter
 
   const addTag = () => {
     const tag = tagInput.trim().toLowerCase()
@@ -85,6 +97,14 @@ export function UploadWizard() {
     }
   }
 
+  const toggleCompat = (opt: string) =>
+    setData((d) => ({
+      ...d,
+      compatibleWith: d.compatibleWith.includes(opt)
+        ? d.compatibleWith.filter((c) => c !== opt)
+        : [...d.compatibleWith, opt],
+    }))
+
   const publicUrl = (bucket: string, path: string) =>
     supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
 
@@ -92,17 +112,19 @@ export function UploadWizard() {
     setLoading(true)
     setError(null)
     try {
-      if (!data.beforeImage || !data.afterImage) throw new Error('Before/after images required')
-      if (!data.presetFile) throw new Error('Preset file required')
+      const hasBefore = data.beforeImage || existingBefore
+      const hasAfter = data.afterImage || existingAfter
+      const hasFile = data.presetFile || existingFile
+      if (!hasBefore || !hasAfter) throw new Error('Before/after images required')
+      if (!hasFile) throw new Error('Preset file required')
       if (!data.title) throw new Error('Title required')
       if (!data.price || isNaN(parseFloat(data.price))) throw new Error('Valid price required')
 
-      // 1. Ask the server for signed upload URLs (service role — no RLS issues).
-      const fileList = [
-        { key: 'before', bucket: 'preset-demos', ext: extOf(data.beforeImage.name) },
-        { key: 'after', bucket: 'preset-demos', ext: extOf(data.afterImage.name) },
-        { key: 'preset', bucket: 'preset-files', ext: extOf(data.presetFile.name) },
-      ]
+      // 1. Only upload files that were newly selected.
+      const fileList: { key: string; bucket: string; ext: string }[] = []
+      if (data.beforeImage) fileList.push({ key: 'before', bucket: 'preset-demos', ext: extOf(data.beforeImage.name) })
+      if (data.afterImage) fileList.push({ key: 'after', bucket: 'preset-demos', ext: extOf(data.afterImage.name) })
+      if (data.presetFile) fileList.push({ key: 'preset', bucket: 'preset-files', ext: extOf(data.presetFile.name) })
       data.additionalPairs.forEach((pair, i) => {
         if (pair.before && pair.after) {
           fileList.push({ key: `add-${i}-before`, bucket: 'preset-demos', ext: extOf(pair.before.name) })
@@ -110,59 +132,70 @@ export function UploadWizard() {
         }
       })
 
-      const prep = await createUploadTargets(fileList)
-      if (prep.error || !prep.targets) throw new Error(prep.error || 'Could not prepare upload')
-      const targets = prep.targets
+      const targets: Record<string, { bucket: string; path: string; token: string }> = {}
+      if (fileList.length > 0) {
+        const prep = await createUploadTargets(fileList)
+        if (prep.error || !prep.targets) throw new Error(prep.error || 'Could not prepare upload')
+        Object.assign(targets, prep.targets)
+      }
 
-      // 2. Upload each file straight to its signed URL.
       const uploadTo = async (key: string, file: File) => {
         const t = targets[key]
         if (!t) throw new Error('Missing upload target')
-        const { error } = await supabase.storage
-          .from(t.bucket)
-          .uploadToSignedUrl(t.path, t.token, file)
-        if (error) throw error
+        const { error: upErr } = await supabase.storage.from(t.bucket).uploadToSignedUrl(t.path, t.token, file)
+        if (upErr) throw upErr
         return t
       }
 
-      const beforeT = await uploadTo('before', data.beforeImage)
-      const afterT = await uploadTo('after', data.afterImage)
+      // 2. Resolve final URLs/paths (new upload or kept existing).
+      const beforeUrl = data.beforeImage
+        ? publicUrl('preset-demos', (await uploadTo('before', data.beforeImage)).path)
+        : existingBefore!
+      const afterUrl = data.afterImage
+        ? publicUrl('preset-demos', (await uploadTo('after', data.afterImage)).path)
+        : existingAfter!
 
-      const additionalPairs: { before: string; after: string }[] = []
+      const newPairs: { before: string; after: string }[] = []
       for (let i = 0; i < data.additionalPairs.length; i++) {
         const pair = data.additionalPairs[i]
         if (pair.before && pair.after) {
           const pb = await uploadTo(`add-${i}-before`, pair.before)
           const pa = await uploadTo(`add-${i}-after`, pair.after)
-          additionalPairs.push({
-            before: publicUrl('preset-demos', pb.path),
-            after: publicUrl('preset-demos', pa.path),
-          })
+          newPairs.push({ before: publicUrl('preset-demos', pb.path), after: publicUrl('preset-demos', pa.path) })
         }
       }
+      const additionalPairs = [...existingAdditional, ...newPairs]
 
-      const presetT = await uploadTo('preset', data.presetFile)
+      const filePath = data.presetFile
+        ? (await uploadTo('preset', data.presetFile)).path
+        : existingFile!.path
+      const fileName = data.presetFile ? data.presetFile.name : existingFile!.name
 
-      // 3. Insert the preset row server-side (seller_id verified server-side).
-      const result = await publishPreset({
+      // 3. Save (update existing draft/preset, or insert a new one).
+      const payload = {
         title: data.title,
         description: data.description || null,
         category: data.category,
         tags: data.tags.length > 0 ? data.tags : null,
         price_cents: Math.round(parseFloat(data.price) * 100),
-        before_image_url: publicUrl('preset-demos', beforeT.path),
-        after_image_url: publicUrl('preset-demos', afterT.path),
+        before_image_url: beforeUrl,
+        after_image_url: afterUrl,
         additional_demo_pairs: additionalPairs.length > 0 ? additionalPairs : null,
-        file_path: presetT.path,
-        file_name: data.presetFile.name,
+        file_path: filePath,
+        file_name: fileName,
         compatible_with: data.compatibleWith.length > 0 ? data.compatibleWith : null,
         whats_included: data.whatsIncluded.trim() || null,
         preset_count: data.presetCount ? parseInt(data.presetCount) : null,
         is_published: !isDraft,
-      })
+      }
+
+      const result = existing
+        ? await updatePreset({ id: existing.id, ...payload })
+        : await publishPreset(payload)
       if (result.error) throw new Error(result.error)
 
       router.push('/dashboard/presets')
+      router.refresh()
     } catch (err: unknown) {
       setError((err as Error).message)
     } finally {
@@ -266,7 +299,7 @@ export function UploadWizard() {
                 <UploadZone
                   accept=".jpg,.jpeg,.webp,.png"
                   maxSize={10 * 1024 * 1024}
-                  label="Drop before photo"
+                  label={existingBefore ? 'Replace before photo' : 'Drop before photo'}
                   hint="JPEG or WebP, max 10 MB"
                   onFile={(f) => setData((d) => ({ ...d, beforeImage: f }))}
                   file={data.beforeImage}
@@ -278,7 +311,7 @@ export function UploadWizard() {
                 <UploadZone
                   accept=".jpg,.jpeg,.webp,.png"
                   maxSize={10 * 1024 * 1024}
-                  label="Drop after photo"
+                  label={existingAfter ? 'Replace after photo' : 'Drop after photo'}
                   hint="JPEG or WebP, max 10 MB"
                   onFile={(f) => setData((d) => ({ ...d, afterImage: f }))}
                   file={data.afterImage}
@@ -289,12 +322,12 @@ export function UploadWizard() {
 
             {beforePreviewUrl && afterPreviewUrl && (
               <div>
-                <Label className="mb-2">Preview</Label>
+                <Label className="mb-2">{isEdit && !data.beforeImage && !data.afterImage ? 'Current preview' : 'Preview'}</Label>
                 <BeforeAfterSlider beforeSrc={beforePreviewUrl} afterSrc={afterPreviewUrl} />
               </div>
             )}
 
-            {data.additionalPairs.length < 3 && (
+            {data.additionalPairs.length + existingAdditional.length < 4 && (
               <Button
                 type="button"
                 variant="outline"
@@ -304,14 +337,23 @@ export function UploadWizard() {
                 + Add another demo pair
               </Button>
             )}
+            {existingAdditional.length > 0 && (
+              <p className="text-xs text-[#888891]">{existingAdditional.length} existing demo pair{existingAdditional.length === 1 ? '' : 's'} will be kept.</p>
+            )}
           </div>
         )}
 
         {/* Step 3: Preset file */}
         {step === 2 && (
           <div className="space-y-4">
+            {existingFile && !data.presetFile && (
+              <div className="flex items-center gap-2 text-sm text-[#f0f0f0] bg-white/[0.03] border border-white/[0.08] rounded-lg px-4 py-3">
+                <Check className="h-4 w-4 text-[#7c5cfc]" />
+                Current file: <span className="font-mono text-[#888891]">{existingFile.name}</span>
+              </div>
+            )}
             <div>
-              <Label className="mb-2">Preset File *</Label>
+              <Label className="mb-2">{existingFile ? 'Replace preset file (optional)' : 'Preset File *'}</Label>
               <UploadZone
                 accept="*"
                 maxSize={50 * 1024 * 1024}
@@ -322,10 +364,6 @@ export function UploadWizard() {
                 onClear={() => setData((d) => ({ ...d, presetFile: null }))}
               />
             </div>
-            <p className="text-xs text-[#888891]">
-              Single preset files (.xmp / .lrtemplate) or a .zip bundle are both supported. Your file is
-              stored securely and only accessible to buyers after purchase.
-            </p>
 
             {/* Pack details */}
             <div className="pt-4 mt-2 border-t border-white/[0.06] space-y-5">
@@ -406,7 +444,7 @@ export function UploadWizard() {
               </div>
               <div>
                 <p className="text-[#888891] mb-0.5">File</p>
-                <p className="text-[#f0f0f0] font-mono text-xs">{data.presetFile?.name || '—'}</p>
+                <p className="text-[#f0f0f0] font-mono text-xs">{data.presetFile?.name || existingFile?.name || '—'}</p>
               </div>
               {data.presetCount && (
                 <div>
@@ -427,13 +465,10 @@ export function UploadWizard() {
                 </div>
               )}
             </div>
-            {data.beforeImage && data.afterImage && (
+            {beforePreviewUrl && afterPreviewUrl && (
               <div>
                 <p className="text-[#888891] text-sm mb-2">Demo preview</p>
-                <BeforeAfterSlider
-                  beforeSrc={URL.createObjectURL(data.beforeImage)}
-                  afterSrc={URL.createObjectURL(data.afterImage)}
-                />
+                <BeforeAfterSlider beforeSrc={beforePreviewUrl} afterSrc={afterPreviewUrl} />
               </div>
             )}
             {data.tags.length > 0 && (
@@ -467,7 +502,7 @@ export function UploadWizard() {
                 {loading ? 'Saving...' : 'Save as Draft'}
               </Button>
               <Button onClick={() => handlePublish(false)} disabled={loading}>
-                {loading ? 'Publishing...' : 'Publish'}
+                {loading ? 'Publishing...' : isEdit && existing?.is_published ? 'Update' : 'Publish'}
               </Button>
             </>
           )}

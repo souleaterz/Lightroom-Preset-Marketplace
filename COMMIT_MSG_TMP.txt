@@ -1,0 +1,9 @@
+feat: edit drafts in the full upload wizard
+
+Clicking a draft (or editing any preset) now reopens the complete multi-step
+upload wizard pre-filled with the saved data, instead of a small metadata-only
+form. Existing images and the preset file are shown and kept unless replaced;
+only newly chosen files are re-uploaded. Adds an updatePreset server action
+(ownership-checked) and removes the old EditPresetForm.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
