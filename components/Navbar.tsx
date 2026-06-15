@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Compass, Menu, X, User, Library, LayoutDashboard, LogOut } from 'lucide-react'
+import { Compass, Menu, X, User, Library, LayoutDashboard, LogOut, Heart, Store } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { isSellerProfile } from '@/lib/utils'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/button'
 
@@ -16,7 +17,28 @@ export function Navbar({ user }: NavbarProps) {
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [isSeller, setIsSeller] = useState(false)
   const supabase = createClient()
+
+  // Members are buyers by default; only sellers see the dashboard.
+  useEffect(() => {
+    if (!user) {
+      setIsSeller(false)
+      return
+    }
+    let active = true
+    supabase
+      .from('profiles')
+      .select('is_seller, stripe_account_id')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (active) setIsSeller(isSellerProfile(data))
+      })
+    return () => {
+      active = false
+    }
+  }, [user, supabase])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -45,12 +67,23 @@ export function Navbar({ user }: NavbarProps) {
             </Link>
             {user ? (
               <>
+                <Link href="/wishlist" className="text-sm text-[#888891] hover:text-[#f0f0f0] transition-colors inline-flex items-center gap-1.5">
+                  <Heart className="h-3.5 w-3.5" />
+                  Wishlist
+                </Link>
                 <Link href="/library" className="text-sm text-[#888891] hover:text-[#f0f0f0] transition-colors">
                   Library
                 </Link>
-                <Link href="/dashboard" className="text-sm text-[#888891] hover:text-[#f0f0f0] transition-colors">
-                  Dashboard
-                </Link>
+                {isSeller ? (
+                  <Link href="/dashboard" className="text-sm text-[#888891] hover:text-[#f0f0f0] transition-colors">
+                    Dashboard
+                  </Link>
+                ) : (
+                  <Link href="/sell" className="text-sm text-[#7c5cfc] hover:text-[#cbb9ff] transition-colors inline-flex items-center gap-1.5">
+                    <Store className="h-3.5 w-3.5" />
+                    Become a Seller
+                  </Link>
+                )}
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -69,6 +102,14 @@ export function Navbar({ user }: NavbarProps) {
                         Account
                       </Link>
                       <Link
+                        href="/wishlist"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-[#888891] hover:text-[#f0f0f0] hover:bg-white/5 transition-all"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Heart className="h-3.5 w-3.5" />
+                        Wishlist
+                      </Link>
+                      <Link
                         href="/library"
                         className="flex items-center gap-2 px-4 py-2 text-sm text-[#888891] hover:text-[#f0f0f0] hover:bg-white/5 transition-all"
                         onClick={() => setUserMenuOpen(false)}
@@ -76,14 +117,25 @@ export function Navbar({ user }: NavbarProps) {
                         <Library className="h-3.5 w-3.5" />
                         Library
                       </Link>
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-[#888891] hover:text-[#f0f0f0] hover:bg-white/5 transition-all"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <LayoutDashboard className="h-3.5 w-3.5" />
-                        Dashboard
-                      </Link>
+                      {isSeller ? (
+                        <Link
+                          href="/dashboard"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-[#888891] hover:text-[#f0f0f0] hover:bg-white/5 transition-all"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <LayoutDashboard className="h-3.5 w-3.5" />
+                          Dashboard
+                        </Link>
+                      ) : (
+                        <Link
+                          href="/sell"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-[#7c5cfc] hover:text-[#cbb9ff] hover:bg-white/5 transition-all"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <Store className="h-3.5 w-3.5" />
+                          Become a Seller
+                        </Link>
+                      )}
                       <div className="border-t border-white/[0.06] my-1" />
                       <button
                         onClick={handleSignOut}
@@ -126,12 +178,21 @@ export function Navbar({ user }: NavbarProps) {
           </Link>
           {user ? (
             <>
+              <Link href="/wishlist" className="block text-sm text-[#888891] hover:text-[#f0f0f0] py-2 transition-colors">
+                Wishlist
+              </Link>
               <Link href="/library" className="block text-sm text-[#888891] hover:text-[#f0f0f0] py-2 transition-colors">
                 My Library
               </Link>
-              <Link href="/dashboard" className="block text-sm text-[#888891] hover:text-[#f0f0f0] py-2 transition-colors">
-                Seller Dashboard
-              </Link>
+              {isSeller ? (
+                <Link href="/dashboard" className="block text-sm text-[#888891] hover:text-[#f0f0f0] py-2 transition-colors">
+                  Seller Dashboard
+                </Link>
+              ) : (
+                <Link href="/sell" className="block text-sm text-[#7c5cfc] hover:text-[#cbb9ff] py-2 transition-colors">
+                  Become a Seller
+                </Link>
+              )}
               <Link href="/account" className="block text-sm text-[#888891] hover:text-[#f0f0f0] py-2 transition-colors">
                 Account
               </Link>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { WishlistProvider } from '@/components/WishlistProvider'
 
 export const metadata: Metadata = {
   title: {
@@ -19,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="bg-[#0a0a0b] text-[#f0f0f0] antialiased font-sans">
-        {children}
+        <WishlistProvider>{children}</WishlistProvider>
       </body>
     </html>
   )

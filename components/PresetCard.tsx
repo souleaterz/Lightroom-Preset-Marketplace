@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Star, Heart } from 'lucide-react'
 import { cn, formatPrice, isDemoPreset } from '@/lib/utils'
+import { useWishlist } from '@/components/WishlistProvider'
 import type { Preset } from '@/types/database'
 
 interface PresetCardProps {
@@ -15,7 +16,8 @@ interface PresetCardProps {
 
 export function PresetCard({ preset, onQuickPreview, className }: PresetCardProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const [isWishlisted, setIsWishlisted] = useState(false)
+  const { isWishlisted: checkWishlisted, toggle } = useWishlist()
+  const isWishlisted = checkWishlisted(preset.id)
   const demo = isDemoPreset(preset)
 
   return (
@@ -95,9 +97,11 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
 
         {/* Wishlist button */}
         <button
+          aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           onClick={(e) => {
             e.preventDefault()
-            setIsWishlisted(!isWishlisted)
+            e.stopPropagation()
+            toggle(preset.id)
           }}
           className={cn(
             'absolute top-2 right-2 p-2 rounded-lg backdrop-blur-sm transition-all duration-200',

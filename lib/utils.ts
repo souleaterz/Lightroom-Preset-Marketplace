@@ -36,3 +36,14 @@ export function truncate(str: string, length: number): string {
 export function isDemoPreset(preset: { file_path?: string | null }): boolean {
   return !!preset.file_path && preset.file_path.startsWith('demo/')
 }
+
+/**
+ * Whether a profile is a seller. Members start as buyers and opt in via the
+ * "Become a Seller" flow. Existing accounts that already onboarded with Stripe
+ * are treated as sellers too, so they keep dashboard access after the role split.
+ */
+export function isSellerProfile(
+  profile?: { is_seller?: boolean | null; stripe_account_id?: string | null } | null
+): boolean {
+  return !!(profile?.is_seller || profile?.stripe_account_id)
+}

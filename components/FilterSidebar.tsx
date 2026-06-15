@@ -163,17 +163,39 @@ export function FilterSidebar() {
         {sidebar}
       </aside>
 
-      {/* Mobile toggle */}
-      <div className="lg:hidden">
-        <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-          <SlidersHorizontal className="h-4 w-4 mr-2" />
-          Filters
-          {hasFilters && (
-            <span className="ml-1.5 w-5 h-5 rounded-full bg-[#7c5cfc] text-white text-xs flex items-center justify-center">
-              {[category !== 'all', maxPrice !== '100', !!minRating].filter(Boolean).length}
-            </span>
-          )}
-        </Button>
+      {/* Mobile top bar: full-width filters button + quick category chips */}
+      <div className="lg:hidden mb-5">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setOpen(true)}
+            className="flex-shrink-0"
+          >
+            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            Filters
+            {hasFilters && (
+              <span className="ml-1.5 w-5 h-5 rounded-full bg-[#7c5cfc] text-white text-xs flex items-center justify-center">
+                {[category !== 'all', maxPrice !== '100', !!minRating, sort !== 'newest'].filter(Boolean).length}
+              </span>
+            )}
+          </Button>
+
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => update('category', cat.value)}
+              className={cn(
+                'flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm transition-all border',
+                category === cat.value
+                  ? 'bg-[#7c5cfc]/15 text-[#7c5cfc] border-[#7c5cfc]/30'
+                  : 'text-[#888891] border-white/[0.08] hover:text-[#f0f0f0] hover:border-white/20'
+              )}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
 
         {open && (
           <div className="fixed inset-0 z-50 flex">

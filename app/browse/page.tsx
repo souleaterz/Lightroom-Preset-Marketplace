@@ -29,7 +29,7 @@ export default async function BrowsePage({
           </p>
         </div>
 
-        <div className="flex gap-8">
+        <div className="flex flex-col lg:flex-row lg:gap-8">
           <Suspense>
             <FilterSidebar />
           </Suspense>

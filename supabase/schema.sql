@@ -10,6 +10,7 @@ create table if not exists profiles (
   avatar_url text,
   stripe_account_id text,
   stripe_account_status text check (stripe_account_status in ('pending', 'active', 'restricted')),
+  is_seller boolean default false,
   total_sales integer default 0,
   created_at timestamptz default now()
 );
