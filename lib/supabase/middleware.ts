@@ -27,5 +27,16 @@ export async function updateSession(request: NextRequest) {
   // Do not run any other logic between createServerClient and getUser().
   await supabase.auth.getUser()
 
+  // Affiliate referral capture: ?ref=CODE → cookie, attributed when the visitor
+  // later becomes a seller. First-touch wins (don't overwrite an existing ref).
+  const ref = request.nextUrl.searchParams.get('ref')
+  if (ref && /^[A-Za-z0-9]{4,16}$/.test(ref) && !request.cookies.get('ps_ref')) {
+    supabaseResponse.cookies.set('ps_ref', ref.toUpperCase(), {
+      maxAge: 60 * 60 * 24 * 60, // 60 days
+      path: '/',
+      sameSite: 'lax',
+    })
+  }
+
   return supabaseResponse
 }

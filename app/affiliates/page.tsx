@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import React from 'react'
+import Link from 'next/link'
 import type { Metadata } from 'next'
 import { ArrowRight, Users, Link2, Wallet, Sparkles } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
@@ -53,6 +54,10 @@ export default async function AffiliatesPage() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Auto-accept: signed-in members go straight to their dashboard (which
+  // enrolls them); signed-out visitors sign in first and land there after.
+  const joinHref = user ? '/affiliate' : '/auth/signin?next=/affiliate'
+
   return (
     <div className="min-h-screen">
       <Navbar user={user} />
@@ -72,13 +77,13 @@ export default async function AffiliatesPage() {
             make — for as long as their shop is open.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a href="mailto:affiliates@presetscout.com?subject=Affiliate%20Program%20Application">
+            <Link href={joinHref}>
               <Button size="lg" className="text-base">
-                Apply to the program
+                Become an affiliate
                 <ArrowRight className="h-5 w-5" />
               </Button>
-            </a>
-            <span className="text-sm text-muted">No cost to join · Get a dedicated affiliate account</span>
+            </Link>
+            <span className="text-sm text-muted">Free to join · Instant approval · Dashboard &amp; tools included</span>
           </div>
         </div>
 
@@ -129,11 +134,11 @@ export default async function AffiliatesPage() {
         <div className="mt-16 rounded-2xl border border-brand/20 bg-gradient-to-br from-brand/15 to-coral/10 p-10 text-center">
           <h2 className="text-2xl font-semibold text-foreground mb-2">Ready to get started?</h2>
           <p className="text-muted mb-6 max-w-md mx-auto">
-            Tell us a little about your audience and we’ll set up your affiliate account.
+            Join in seconds — get your referral link, dashboard, and onboarding tools instantly.
           </p>
-          <a href="mailto:affiliates@presetscout.com?subject=Affiliate%20Program%20Application">
-            <Button size="lg">Apply now <ArrowRight className="h-5 w-5" /></Button>
-          </a>
+          <Link href={joinHref}>
+            <Button size="lg">Become an affiliate <ArrowRight className="h-5 w-5" /></Button>
+          </Link>
         </div>
       </div>
     </div>

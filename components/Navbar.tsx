@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Compass, Menu, X, User, Library, LayoutDashboard, LogOut, Heart, Store } from 'lucide-react'
+import { Compass, Menu, X, User, Library, LayoutDashboard, LogOut, Heart, Store, Share2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { isSellerProfile } from '@/lib/utils'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
@@ -19,12 +19,14 @@ export function Navbar({ user }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [isSeller, setIsSeller] = useState(false)
+  const [isAffiliate, setIsAffiliate] = useState(false)
   const supabase = createClient()
 
   // Members are buyers by default; only sellers see the dashboard.
   useEffect(() => {
     if (!user) {
       setIsSeller(false)
+      setIsAffiliate(false)
       return
     }
     let active = true
@@ -35,6 +37,16 @@ export function Navbar({ user }: NavbarProps) {
       .single()
       .then(({ data }) => {
         if (active) setIsSeller(isSellerProfile(data))
+      })
+    // Separate query so a missing is_affiliate column (migration not applied)
+    // can't break seller detection above.
+    supabase
+      .from('profiles')
+      .select('is_affiliate')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (active) setIsAffiliate(!!(data as { is_affiliate?: boolean } | null)?.is_affiliate)
       })
     return () => {
       active = false
@@ -138,6 +150,16 @@ export function Navbar({ user }: NavbarProps) {
                           Become a Seller
                         </Link>
                       )}
+                      {isAffiliate && (
+                        <Link
+                          href="/affiliate"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-muted hover:text-foreground hover:bg-overlay transition-all"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <Share2 className="h-3.5 w-3.5" />
+                          Affiliate
+                        </Link>
+                      )}
                       <div className="border-t border-line my-1" />
                       <button
                         onClick={handleSignOut}
@@ -197,6 +219,11 @@ export function Navbar({ user }: NavbarProps) {
               ) : (
                 <Link href="/sell" className="block text-sm text-[#7c5cfc] hover:text-[#cbb9ff] py-2 transition-colors">
                   Become a Seller
+                </Link>
+              )}
+              {isAffiliate && (
+                <Link href="/affiliate" className="block text-sm text-muted hover:text-foreground py-2 transition-colors">
+                  Affiliate Dashboard
                 </Link>
               )}
               <Link href="/account" className="block text-sm text-muted hover:text-foreground py-2 transition-colors">

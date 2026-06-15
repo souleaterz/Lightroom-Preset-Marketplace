@@ -11,9 +11,16 @@ create table if not exists profiles (
   stripe_account_id text,
   stripe_account_status text check (stripe_account_status in ('pending', 'active', 'restricted')),
   is_seller boolean default false,
+  is_affiliate boolean default false,
+  affiliate_code text,
+  referred_by uuid references profiles(id),
   total_sales integer default 0,
   created_at timestamptz default now()
 );
+
+create unique index if not exists idx_profiles_affiliate_code
+  on profiles(affiliate_code) where affiliate_code is not null;
+create index if not exists idx_profiles_referred_by on profiles(referred_by);
 
 -- Presets
 create table if not exists presets (
