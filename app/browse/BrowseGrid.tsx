@@ -56,8 +56,8 @@ export async function BrowseGrid({ searchParams }: BrowseGridProps) {
     return (
       <div className="text-center py-20">
         <div className="text-4xl mb-4">🔍</div>
-        <h3 className="text-lg font-semibold text-[#f0f0f0] mb-2">No presets found</h3>
-        <p className="text-[#888891]">Try adjusting your filters</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">No presets found</h3>
+        <p className="text-muted">Try adjusting your filters</p>
       </div>
     )
   }

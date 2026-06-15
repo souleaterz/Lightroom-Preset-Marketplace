@@ -28,8 +28,8 @@ export function ReviewSection({
   return (
     <div className="space-y-8">
       {userPurchase && !hasReviewed && (
-        <div className="p-6 bg-[#111114] border border-white/[0.08] rounded-xl">
-          <h3 className="text-base font-semibold text-[#f0f0f0] mb-4">Leave a Review</h3>
+        <div className="p-6 bg-surface border border-line rounded-xl">
+          <h3 className="text-base font-semibold text-foreground mb-4">Leave a Review</h3>
           <ReviewForm
             presetId={presetId}
             purchaseId={userPurchase.id}

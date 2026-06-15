@@ -67,13 +67,13 @@ export function UploadZone({
       <div className={cn('flex items-center gap-4 p-4 bg-[#7c5cfc]/10 border border-[#7c5cfc]/30 rounded-xl', className)}>
         <CheckCircle className="h-8 w-8 text-[#7c5cfc] flex-shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-[#f0f0f0] truncate">{file.name}</p>
-          <p className="text-xs text-[#888891]">{(file.size / 1024).toFixed(1)} KB</p>
+          <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
+          <p className="text-xs text-muted">{(file.size / 1024).toFixed(1)} KB</p>
         </div>
         {onClear && (
           <button
             onClick={onClear}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-[#888891] hover:text-[#f0f0f0] transition-all"
+            className="p-1.5 rounded-lg hover:bg-overlay-strong text-muted hover:text-foreground transition-all"
           >
             <X className="h-4 w-4" />
           </button>
@@ -93,7 +93,7 @@ export function UploadZone({
           'relative flex flex-col items-center justify-center p-8 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200',
           isDragOver
             ? 'border-[#7c5cfc] bg-[#7c5cfc]/10'
-            : 'border-white/10 hover:border-white/20 hover:bg-white/[0.02]'
+            : 'border-line hover:border-line-strong hover:bg-overlay'
         )}
       >
         <input
@@ -105,16 +105,16 @@ export function UploadZone({
         />
         <div className={cn(
           'w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-colors',
-          isDragOver ? 'bg-[#7c5cfc]/20' : 'bg-white/5'
+          isDragOver ? 'bg-[#7c5cfc]/20' : 'bg-overlay'
         )}>
           {isDragOver ? (
             <File className="h-7 w-7 text-[#7c5cfc]" />
           ) : (
-            <Upload className="h-7 w-7 text-[#888891]" />
+            <Upload className="h-7 w-7 text-muted" />
           )}
         </div>
-        <p className="text-sm font-medium text-[#f0f0f0] mb-1">{label}</p>
-        <p className="text-xs text-[#888891]">{hint}</p>
+        <p className="text-sm font-medium text-foreground mb-1">{label}</p>
+        <p className="text-xs text-muted">{hint}</p>
       </div>
       {error && (
         <p className="mt-2 text-xs text-red-400">{error}</p>

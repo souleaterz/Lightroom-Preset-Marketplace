@@ -28,15 +28,15 @@ export default async function WishlistPage() {
       <Navbar user={user} />
       <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-[#f0f0f0]">Wishlist</h1>
-          <p className="text-[#888891] mt-1">{presets.length} saved preset{presets.length !== 1 ? 's' : ''}</p>
+          <h1 className="text-3xl font-semibold text-foreground">Wishlist</h1>
+          <p className="text-muted mt-1">{presets.length} saved preset{presets.length !== 1 ? 's' : ''}</p>
         </div>
 
         {presets.length === 0 ? (
           <div className="text-center py-20">
-            <Heart className="h-12 w-12 text-[#888891] mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-[#f0f0f0] mb-2">Your wishlist is empty</h2>
-            <p className="text-[#888891] mb-6">Save presets you love for later</p>
+            <Heart className="h-12 w-12 text-muted mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-foreground mb-2">Your wishlist is empty</h2>
+            <p className="text-muted mb-6">Save presets you love for later</p>
             <Link href="/browse">
               <Button>Browse Presets</Button>
             </Link>

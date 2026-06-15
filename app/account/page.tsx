@@ -18,8 +18,8 @@ export default async function AccountPage() {
       <Navbar user={user} />
       <div className="max-w-2xl mx-auto px-4 py-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-[#f0f0f0]">Account Settings</h1>
-          <p className="text-[#888891] mt-1">Manage your profile and preferences</p>
+          <h1 className="text-3xl font-semibold text-foreground">Account Settings</h1>
+          <p className="text-muted mt-1">Manage your profile and preferences</p>
         </div>
         <AccountForm profile={profile} />
       </div>

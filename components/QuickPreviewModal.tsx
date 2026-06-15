@@ -21,7 +21,7 @@ export function QuickPreviewModal({ preset, onClose }: QuickPreviewModalProps) {
       <DialogHeader>
         <DialogTitle>{preset.title}</DialogTitle>
         {preset.profiles && (
-          <p className="text-sm text-[#888891] mt-1">
+          <p className="text-sm text-muted mt-1">
             by {preset.profiles.display_name || preset.profiles.username}
           </p>
         )}
@@ -33,7 +33,7 @@ export function QuickPreviewModal({ preset, onClose }: QuickPreviewModalProps) {
           className="mb-4"
         />
         <div className="flex items-center justify-between">
-          <span className="font-mono text-2xl font-semibold text-[#f0f0f0]">
+          <span className="font-mono text-2xl font-semibold text-foreground">
             {formatPrice(preset.price_cents)}
           </span>
           <div className="flex gap-3">

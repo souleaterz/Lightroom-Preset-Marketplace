@@ -35,10 +35,10 @@ export default async function SellPage() {
             <Sparkles className="h-3.5 w-3.5" />
             Founding creators: 0% fees for your first month
           </div>
-          <h1 className="text-4xl sm:text-5xl font-semibold text-[#f0f0f0] mb-4">
+          <h1 className="text-4xl sm:text-5xl font-semibold text-foreground mb-4">
             Turn your style into income
           </h1>
-          <p className="text-[#9a9aa3] text-lg max-w-xl mx-auto mb-9">
+          <p className="text-muted text-lg max-w-xl mx-auto mb-9">
             List your presets, set your own price, and keep 92% of every sale. Free to join —
             and your first month is completely fee-free.
           </p>
@@ -63,17 +63,17 @@ export default async function SellPage() {
             { icon: Tag, title: 'Zero fees to start', desc: 'Your first month is completely fee-free, so your earliest sales are entirely yours.' },
             { icon: Eye, title: 'Sell with confidence', desc: 'Every listing ships with a live before/after slider that sells the look for you.' },
           ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="rounded-2xl border border-white/[0.08] bg-[#111114] p-7">
+            <div key={title} className="rounded-2xl border border-line bg-surface p-7">
               <div className="w-12 h-12 rounded-xl bg-[#7c5cfc]/10 flex items-center justify-center mb-5">
                 <Icon className="h-6 w-6 text-[#7c5cfc]" />
               </div>
-              <h3 className="text-lg font-semibold text-[#f0f0f0] mb-2">{title}</h3>
-              <p className="text-sm text-[#888891] leading-relaxed">{desc}</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
+              <p className="text-sm text-muted leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 flex items-center justify-center gap-2 text-sm text-[#888891]">
+        <div className="mt-12 flex items-center justify-center gap-2 text-sm text-muted">
           <Star className="h-4 w-4 text-[#7c5cfc]" />
           You stay a buyer too — becoming a seller just unlocks your dashboard.
           <Compass className="h-4 w-4 text-[#7c5cfc]" />

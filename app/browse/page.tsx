@@ -21,8 +21,8 @@ export default async function BrowsePage({
       <Navbar user={user} />
       <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-[#f0f0f0]">Browse Presets</h1>
-          <p className="text-[#888891] mt-1">
+          <h1 className="text-3xl font-semibold text-foreground">Browse Presets</h1>
+          <p className="text-muted mt-1">
             {searchParams.category && searchParams.category !== 'all'
               ? `${searchParams.category.charAt(0).toUpperCase() + searchParams.category.slice(1)} presets`
               : 'All presets'}
@@ -49,11 +49,11 @@ function GridSkeleton() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
       {Array.from({ length: 9 }).map((_, i) => (
-        <div key={i} className="bg-[#111114] rounded-xl overflow-hidden animate-pulse">
-          <div className="aspect-[4/3] bg-white/5" />
+        <div key={i} className="bg-surface rounded-xl overflow-hidden animate-pulse">
+          <div className="aspect-[4/3] bg-overlay" />
           <div className="p-4 space-y-2">
-            <div className="h-4 bg-white/5 rounded w-3/4" />
-            <div className="h-3 bg-white/5 rounded w-1/2" />
+            <div className="h-4 bg-overlay rounded w-3/4" />
+            <div className="h-3 bg-overlay rounded w-1/2" />
           </div>
         </div>
       ))}

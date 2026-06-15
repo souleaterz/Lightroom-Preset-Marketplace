@@ -81,8 +81,8 @@ export default async function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-semibold text-[#f0f0f0]">Dashboard</h1>
-            <p className="text-[#888891] mt-1">Welcome back, {seller?.display_name || seller?.username}</p>
+            <h1 className="text-3xl font-semibold text-foreground">Dashboard</h1>
+            <p className="text-muted mt-1">Welcome back, {seller?.display_name || seller?.username}</p>
           </div>
           <Link href="/dashboard/presets/new">
             <Button>
@@ -118,42 +118,42 @@ export default async function DashboardPage() {
             { label: 'Total Sales', value: allPurchases.length.toString(), icon: Package, color: 'text-[#e05c7a]' },
             { label: 'Published', value: topPresets.filter((p) => p.is_published).length.toString(), icon: Package, color: 'text-blue-400' },
           ].map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="bg-[#111114] border border-white/[0.08] rounded-xl p-5">
+            <div key={label} className="bg-surface border border-line rounded-xl p-5">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-[#888891]">{label}</span>
+                <span className="text-sm text-muted">{label}</span>
                 <Icon className={`h-4 w-4 ${color}`} />
               </div>
-              <div className="font-mono text-2xl font-bold text-[#f0f0f0]">{value}</div>
+              <div className="font-mono text-2xl font-bold text-foreground">{value}</div>
             </div>
           ))}
         </div>
 
         {/* Revenue chart */}
-        <div className="bg-[#111114] border border-white/[0.08] rounded-xl p-6 mb-8">
-          <h2 className="text-base font-semibold text-[#f0f0f0] mb-5">Revenue — Last 30 days</h2>
+        <div className="bg-surface border border-line rounded-xl p-6 mb-8">
+          <h2 className="text-base font-semibold text-foreground mb-5">Revenue — Last 30 days</h2>
           <RevenueChart data={revenueData} />
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Recent sales */}
-          <div className="bg-[#111114] border border-white/[0.08] rounded-xl p-6">
+          <div className="bg-surface border border-line rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-[#f0f0f0]">Recent Sales</h2>
+              <h2 className="text-base font-semibold text-foreground">Recent Sales</h2>
               <Link href="/dashboard/presets" className="text-xs text-[#7c5cfc] hover:underline">
                 View all
               </Link>
             </div>
             {recentSales.length === 0 ? (
-              <p className="text-sm text-[#888891] py-4">No sales yet.</p>
+              <p className="text-sm text-muted py-4">No sales yet.</p>
             ) : (
               <div className="space-y-3">
                 {recentSales.map((sale) => (
                   <div key={sale.id} className="flex items-center justify-between text-sm">
                     <div className="min-w-0 flex-1">
-                      <p className="text-[#f0f0f0] truncate">
+                      <p className="text-foreground truncate">
                         {(sale as Purchase & { presets?: { title: string } }).presets?.title || 'Unknown'}
                       </p>
-                      <p className="text-xs text-[#888891]">{formatDate(sale.created_at)}</p>
+                      <p className="text-xs text-muted">{formatDate(sale.created_at)}</p>
                     </div>
                     <div className="flex-shrink-0 ml-4">
                       <span className="font-mono text-sm text-green-400">
@@ -167,16 +167,16 @@ export default async function DashboardPage() {
           </div>
 
           {/* Top presets */}
-          <div className="bg-[#111114] border border-white/[0.08] rounded-xl p-6">
+          <div className="bg-surface border border-line rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-[#f0f0f0]">Top Presets</h2>
+              <h2 className="text-base font-semibold text-foreground">Top Presets</h2>
               <Link href="/dashboard/presets" className="text-xs text-[#7c5cfc] hover:underline">
                 Manage
               </Link>
             </div>
             {topPresets.length === 0 ? (
               <div className="text-center py-6">
-                <p className="text-sm text-[#888891] mb-4">No presets yet</p>
+                <p className="text-sm text-muted mb-4">No presets yet</p>
                 <Link href="/dashboard/presets/new">
                   <Button size="sm">Upload your first preset</Button>
                 </Link>
@@ -186,10 +186,10 @@ export default async function DashboardPage() {
                 {topPresets.map((preset) => (
                   <div key={preset.id} className="flex items-center justify-between text-sm">
                     <div className="min-w-0 flex-1">
-                      <Link href={`/preset/${preset.id}`} className="text-[#f0f0f0] hover:text-white transition-colors truncate block">
+                      <Link href={`/preset/${preset.id}`} className="text-foreground hover:text-white transition-colors truncate block">
                         {preset.title}
                       </Link>
-                      <p className="text-xs text-[#888891]">{preset.downloads} downloads</p>
+                      <p className="text-xs text-muted">{preset.downloads} downloads</p>
                     </div>
                     <div className="flex-shrink-0 ml-4">
                       <Badge variant={preset.is_published ? 'default' : 'secondary'}>

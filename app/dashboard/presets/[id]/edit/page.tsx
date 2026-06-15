@@ -28,10 +28,10 @@ export default async function EditPresetPage({ params }: { params: { id: string 
       <Navbar user={user} />
       <div className="max-w-3xl mx-auto px-4 py-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-[#f0f0f0]">
+          <h1 className="text-3xl font-semibold text-foreground">
             {isDraft ? 'Continue your draft' : 'Edit preset'}
           </h1>
-          <p className="text-[#888891] mt-1">
+          <p className="text-muted mt-1">
             {isDraft
               ? 'Pick up where you left off — all your steps are saved.'
               : preset.title}

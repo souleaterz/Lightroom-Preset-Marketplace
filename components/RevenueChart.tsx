@@ -19,9 +19,9 @@ interface RevenueChartProps {
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#1a1a1f] border border-white/10 rounded-lg px-3 py-2 shadow-xl">
-        <p className="text-xs text-[#888891] mb-1">{label}</p>
-        <p className="text-sm font-semibold text-[#f0f0f0]">{formatPrice(payload[0].value * 100)}</p>
+      <div className="bg-surface-2 border border-line rounded-lg px-3 py-2 shadow-xl">
+        <p className="text-xs text-muted mb-1">{label}</p>
+        <p className="text-sm font-semibold text-foreground">{formatPrice(payload[0].value * 100)}</p>
       </div>
     )
   }
@@ -38,16 +38,16 @@ export function RevenueChart({ data }: RevenueChartProps) {
             <stop offset="95%" stopColor="#7c5cfc" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" vertical={false} />
         <XAxis
           dataKey="date"
-          tick={{ fill: '#888891', fontSize: 11 }}
+          tick={{ fill: 'var(--muted)', fontSize: 11 }}
           axisLine={false}
           tickLine={false}
           interval="preserveStartEnd"
         />
         <YAxis
-          tick={{ fill: '#888891', fontSize: 11 }}
+          tick={{ fill: 'var(--muted)', fontSize: 11 }}
           axisLine={false}
           tickLine={false}
           tickFormatter={(v) => `£${v}`}

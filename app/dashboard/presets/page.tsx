@@ -32,8 +32,8 @@ export default async function ManagePresetsPage() {
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-semibold text-[#f0f0f0]">My Presets</h1>
-            <p className="text-[#888891] mt-1">{presets.length} preset{presets.length !== 1 ? 's' : ''}</p>
+            <h1 className="text-3xl font-semibold text-foreground">My Presets</h1>
+            <p className="text-muted mt-1">{presets.length} preset{presets.length !== 1 ? 's' : ''}</p>
           </div>
           <Link href="/dashboard/presets/new">
             <Button>
@@ -45,8 +45,8 @@ export default async function ManagePresetsPage() {
 
         {presets.length === 0 ? (
           <div className="text-center py-20">
-            <h2 className="text-xl font-semibold text-[#f0f0f0] mb-2">No presets yet</h2>
-            <p className="text-[#888891] mb-6">Upload your first preset and start selling</p>
+            <h2 className="text-xl font-semibold text-foreground mb-2">No presets yet</h2>
+            <p className="text-muted mb-6">Upload your first preset and start selling</p>
             <Link href="/dashboard/presets/new">
               <Button>Upload Preset</Button>
             </Link>
@@ -54,7 +54,7 @@ export default async function ManagePresetsPage() {
         ) : (
           <div className="space-y-3">
             {presets.map((preset) => (
-              <div key={preset.id} className="flex items-center gap-4 p-4 bg-[#111114] border border-white/[0.08] rounded-xl hover:border-white/20 transition-colors">
+              <div key={preset.id} className="flex items-center gap-4 p-4 bg-surface border border-line rounded-xl hover:border-line-strong transition-colors">
                 <div className="relative w-16 h-12 rounded-lg overflow-hidden flex-shrink-0">
                   <Image
                     src={preset.after_image_url}
@@ -65,14 +65,14 @@ export default async function ManagePresetsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <Link href={`/preset/${preset.id}`} className="font-medium text-[#f0f0f0] hover:text-white transition-colors truncate">
+                    <Link href={`/preset/${preset.id}`} className="font-medium text-foreground hover:text-white transition-colors truncate">
                       {preset.title}
                     </Link>
                     <Badge variant={preset.is_published ? 'default' : 'secondary'}>
                       {preset.is_published ? 'Live' : 'Draft'}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-[#888891]">
+                  <div className="flex items-center gap-4 text-xs text-muted">
                     <span className="font-mono">{formatPrice(preset.price_cents)}</span>
                     <span>{preset.downloads} downloads</span>
                     <span>{preset.rating_count > 0 ? `${preset.rating_avg.toFixed(1)}★` : 'No reviews'}</span>

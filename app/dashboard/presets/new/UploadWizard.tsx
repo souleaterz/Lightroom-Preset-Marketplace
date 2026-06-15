@@ -225,18 +225,18 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
                   i <= maxReached && 'group-hover:ring-2 group-hover:ring-[#7c5cfc]/40',
                   i < step ? 'bg-[#7c5cfc] text-white' :
                   i === step ? 'bg-[#7c5cfc]/20 border-2 border-[#7c5cfc] text-[#7c5cfc]' :
-                  'bg-white/5 text-[#888891]'
+                  'bg-overlay text-muted'
                 )}>
                   {i < step ? <Check className="h-3.5 w-3.5" /> : i + 1}
                 </div>
                 <span className={cn(
                   'text-sm hidden sm:block transition-colors',
-                  i === step ? 'text-[#f0f0f0]' :
-                  i <= maxReached ? 'text-[#888891] group-hover:text-[#f0f0f0]' : 'text-[#888891]/50'
+                  i === step ? 'text-foreground' :
+                  i <= maxReached ? 'text-muted group-hover:text-foreground' : 'text-muted/50'
                 )}>{s}</span>
               </button>
               {i < STEPS.length - 1 && (
-                <div className={cn('flex-1 h-0.5 mx-3', i < step ? 'bg-[#7c5cfc]' : 'bg-white/10')} />
+                <div className={cn('flex-1 h-0.5 mx-3', i < step ? 'bg-[#7c5cfc]' : 'bg-overlay-strong')} />
               )}
             </React.Fragment>
           ))}
@@ -244,7 +244,7 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
       </div>
 
       {/* Step content */}
-      <div className="bg-[#111114] border border-white/[0.08] rounded-2xl p-8">
+      <div className="bg-surface border border-line rounded-2xl p-8">
         {/* Step 1: Basics */}
         {step === 0 && (
           <div className="space-y-5">
@@ -260,7 +260,7 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
               <div>
                 <Label className="mb-1.5">Category *</Label>
                 <Select value={data.category} onChange={(e) => setData((d) => ({ ...d, category: e.target.value }))}>
-                  {CATEGORIES.map((c) => <option key={c} value={c} className="bg-[#111114]">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+                  {CATEGORIES.map((c) => <option key={c} value={c} className="bg-surface">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                 </Select>
               </div>
               <div>
@@ -338,7 +338,7 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
               </Button>
             )}
             {existingAdditional.length > 0 && (
-              <p className="text-xs text-[#888891]">{existingAdditional.length} existing demo pair{existingAdditional.length === 1 ? '' : 's'} will be kept.</p>
+              <p className="text-xs text-muted">{existingAdditional.length} existing demo pair{existingAdditional.length === 1 ? '' : 's'} will be kept.</p>
             )}
           </div>
         )}
@@ -347,9 +347,9 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
         {step === 2 && (
           <div className="space-y-4">
             {existingFile && !data.presetFile && (
-              <div className="flex items-center gap-2 text-sm text-[#f0f0f0] bg-white/[0.03] border border-white/[0.08] rounded-lg px-4 py-3">
+              <div className="flex items-center gap-2 text-sm text-foreground bg-overlay border border-line rounded-lg px-4 py-3">
                 <Check className="h-4 w-4 text-[#7c5cfc]" />
-                Current file: <span className="font-mono text-[#888891]">{existingFile.name}</span>
+                Current file: <span className="font-mono text-muted">{existingFile.name}</span>
               </div>
             )}
             <div>
@@ -366,8 +366,8 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
             </div>
 
             {/* Pack details */}
-            <div className="pt-4 mt-2 border-t border-white/[0.06] space-y-5">
-              <h3 className="text-sm font-semibold text-[#f0f0f0]">Pack details</h3>
+            <div className="pt-4 mt-2 border-t border-line space-y-5">
+              <h3 className="text-sm font-semibold text-foreground">Pack details</h3>
 
               <div>
                 <Label className="mb-2">Compatible with</Label>
@@ -382,13 +382,13 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
                         className={cn(
                           'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-left transition-all',
                           checked
-                            ? 'border-[#7c5cfc]/50 bg-[#7c5cfc]/10 text-[#f0f0f0]'
-                            : 'border-white/10 text-[#888891] hover:border-white/20'
+                            ? 'border-[#7c5cfc]/50 bg-[#7c5cfc]/10 text-foreground'
+                            : 'border-line text-muted hover:border-line-strong'
                         )}
                       >
                         <span className={cn(
                           'w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border',
-                          checked ? 'bg-[#7c5cfc] border-[#7c5cfc]' : 'border-white/20'
+                          checked ? 'bg-[#7c5cfc] border-[#7c5cfc]' : 'border-line-strong'
                         )}>
                           {checked && <Check className="h-3 w-3 text-white" />}
                         </span>
@@ -428,46 +428,46 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
         {/* Step 4: Review */}
         {step === 3 && (
           <div className="space-y-5">
-            <h3 className="font-semibold text-[#f0f0f0]">Review your preset</h3>
+            <h3 className="font-semibold text-foreground">Review your preset</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-[#888891] mb-0.5">Title</p>
-                <p className="text-[#f0f0f0]">{data.title || '—'}</p>
+                <p className="text-muted mb-0.5">Title</p>
+                <p className="text-foreground">{data.title || '—'}</p>
               </div>
               <div>
-                <p className="text-[#888891] mb-0.5">Price</p>
-                <p className="text-[#f0f0f0] font-mono">£{data.price || '—'}</p>
+                <p className="text-muted mb-0.5">Price</p>
+                <p className="text-foreground font-mono">£{data.price || '—'}</p>
               </div>
               <div>
-                <p className="text-[#888891] mb-0.5">Category</p>
-                <p className="text-[#f0f0f0] capitalize">{data.category}</p>
+                <p className="text-muted mb-0.5">Category</p>
+                <p className="text-foreground capitalize">{data.category}</p>
               </div>
               <div>
-                <p className="text-[#888891] mb-0.5">File</p>
-                <p className="text-[#f0f0f0] font-mono text-xs">{data.presetFile?.name || existingFile?.name || '—'}</p>
+                <p className="text-muted mb-0.5">File</p>
+                <p className="text-foreground font-mono text-xs">{data.presetFile?.name || existingFile?.name || '—'}</p>
               </div>
               {data.presetCount && (
                 <div>
-                  <p className="text-[#888891] mb-0.5">Presets in pack</p>
-                  <p className="text-[#f0f0f0]">{data.presetCount}</p>
+                  <p className="text-muted mb-0.5">Presets in pack</p>
+                  <p className="text-foreground">{data.presetCount}</p>
                 </div>
               )}
               {data.compatibleWith.length > 0 && (
                 <div className="col-span-2">
-                  <p className="text-[#888891] mb-0.5">Compatible with</p>
-                  <p className="text-[#f0f0f0]">{data.compatibleWith.join(', ')}</p>
+                  <p className="text-muted mb-0.5">Compatible with</p>
+                  <p className="text-foreground">{data.compatibleWith.join(', ')}</p>
                 </div>
               )}
               {data.whatsIncluded.trim() && (
                 <div className="col-span-2">
-                  <p className="text-[#888891] mb-0.5">What&apos;s included</p>
-                  <p className="text-[#f0f0f0] whitespace-pre-line">{data.whatsIncluded}</p>
+                  <p className="text-muted mb-0.5">What&apos;s included</p>
+                  <p className="text-foreground whitespace-pre-line">{data.whatsIncluded}</p>
                 </div>
               )}
             </div>
             {beforePreviewUrl && afterPreviewUrl && (
               <div>
-                <p className="text-[#888891] text-sm mb-2">Demo preview</p>
+                <p className="text-muted text-sm mb-2">Demo preview</p>
                 <BeforeAfterSlider beforeSrc={beforePreviewUrl} afterSrc={afterPreviewUrl} />
               </div>
             )}

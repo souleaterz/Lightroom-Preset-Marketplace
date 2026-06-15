@@ -56,7 +56,7 @@ export default async function SellerPage({ params }: Props) {
       <Navbar user={user} />
 
       {/* Hero */}
-      <div className="border-b border-white/[0.06] py-12 px-4">
+      <div className="border-b border-line py-12 px-4">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-6">
           <div className="w-20 h-20 rounded-2xl bg-[#7c5cfc]/20 border border-[#7c5cfc]/30 flex items-center justify-center overflow-hidden flex-shrink-0">
             {seller.avatar_url ? (
@@ -68,24 +68,24 @@ export default async function SellerPage({ params }: Props) {
             )}
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold text-[#f0f0f0]">
+            <h1 className="text-2xl font-semibold text-foreground">
               {seller.display_name || seller.username}
             </h1>
-            <p className="text-sm text-[#888891] mt-0.5">@{seller.username}</p>
+            <p className="text-sm text-muted mt-0.5">@{seller.username}</p>
             {seller.bio && (
-              <p className="text-[#888891] mt-3 max-w-xl">{seller.bio}</p>
+              <p className="text-muted mt-3 max-w-xl">{seller.bio}</p>
             )}
             <div className="flex items-center gap-6 mt-4">
-              <div className="flex items-center gap-1.5 text-sm text-[#888891]">
+              <div className="flex items-center gap-1.5 text-sm text-muted">
                 <Package className="h-4 w-4" />
                 <span>{presets.length} presets</span>
               </div>
-              <div className="flex items-center gap-1.5 text-sm text-[#888891]">
+              <div className="flex items-center gap-1.5 text-sm text-muted">
                 <Download className="h-4 w-4" />
                 <span>{seller.total_sales} sales</span>
               </div>
               {avgRating > 0 && (
-                <div className="flex items-center gap-1.5 text-sm text-[#888891]">
+                <div className="flex items-center gap-1.5 text-sm text-muted">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span>{avgRating.toFixed(1)} avg rating</span>
                 </div>
@@ -99,7 +99,7 @@ export default async function SellerPage({ params }: Props) {
       <div className="max-w-5xl mx-auto px-4 py-10">
         {presets.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-[#888891]">No presets published yet.</p>
+            <p className="text-muted">No presets published yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

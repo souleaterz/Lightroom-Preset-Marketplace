@@ -33,13 +33,13 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
       />
       <div
         className={cn(
-          'relative bg-[#111114] border border-white/10 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto',
+          'relative bg-surface border border-line rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto',
           className
         )}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-[#888891] hover:text-[#f0f0f0] transition-all"
+          className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-overlay hover:bg-overlay-strong text-muted hover:text-foreground transition-all"
         >
           <X className="h-4 w-4" />
         </button>
@@ -59,7 +59,7 @@ export function DialogHeader({ children, className }: { children: React.ReactNod
 
 export function DialogTitle({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <h2 className={cn('text-xl font-semibold text-[#f0f0f0]', className)}>
+    <h2 className={cn('text-xl font-semibold text-foreground', className)}>
       {children}
     </h2>
   )

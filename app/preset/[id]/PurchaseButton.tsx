@@ -61,7 +61,7 @@ export function PurchaseButton({ preset }: PurchaseButtonProps) {
         )}
       </Button>
       {error && <p className="text-xs text-red-400 text-center">{error}</p>}
-      <p className="text-xs text-center text-[#888891]">Secure payment via Stripe</p>
+      <p className="text-xs text-center text-muted">Secure payment via Stripe</p>
     </div>
   )
 }

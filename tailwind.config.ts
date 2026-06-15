@@ -10,15 +10,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0a0a0b",
-        surface: "#111114",
-        border: "rgba(255,255,255,0.08)",
-        "text-primary": "#f0f0f0",
-        "text-muted": "#888891",
-        accent: {
-          purple: "#7c5cfc",
-          coral: "#e05c7a",
-        },
+        // Semantic tokens — driven by CSS variables so they flip with the theme.
+        canvas: "var(--bg)",
+        surface: "var(--surface)",
+        "surface-2": "var(--surface-2)",
+        foreground: "var(--fg)",
+        muted: "var(--muted)",
+        line: "var(--line)",
+        "line-strong": "var(--line-strong)",
+        overlay: "var(--overlay)",
+        "overlay-strong": "var(--overlay-strong)",
+        nav: "var(--nav-bg)",
+        // Brand accents stay constant across themes.
+        brand: "#7c5cfc",
+        "brand-soft": "#cbb9ff",
+        coral: "#e05c7a",
       },
       fontFamily: {
         serif: ["Instrument Serif", "serif"],

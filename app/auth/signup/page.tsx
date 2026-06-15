@@ -58,23 +58,23 @@ export default function SignUpPage() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7c5cfc] to-[#e05c7a] flex items-center justify-center">
               <Compass className="h-4 w-4 text-white" />
             </div>
-            <span className="font-semibold text-[#f0f0f0] text-lg">
+            <span className="font-semibold text-foreground text-lg">
               Preset<span className="text-[#7c5cfc]">Scout</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-semibold text-[#f0f0f0]">Create your account</h1>
-          <p className="text-[#888891] mt-1">Free to join. Start buying or selling presets.</p>
+          <h1 className="text-2xl font-semibold text-foreground">Create your account</h1>
+          <p className="text-muted mt-1">Free to join. Start buying or selling presets.</p>
         </div>
 
-        <div className="bg-[#111114] border border-white/[0.08] rounded-2xl p-8 space-y-5">
+        <div className="bg-surface border border-line rounded-2xl p-8 space-y-5">
           {sent ? (
             <div className="text-center space-y-3">
               <div className="w-14 h-14 rounded-2xl bg-[#7c5cfc]/10 flex items-center justify-center mx-auto">
                 <Mail className="h-7 w-7 text-[#7c5cfc]" />
               </div>
-              <h2 className="font-semibold text-[#f0f0f0]">Check your email</h2>
-              <p className="text-sm text-[#888891]">
-                We sent a confirmation link to <strong className="text-[#f0f0f0]">{email}</strong>
+              <h2 className="font-semibold text-foreground">Check your email</h2>
+              <p className="text-sm text-muted">
+                We sent a confirmation link to <strong className="text-foreground">{email}</strong>
               </p>
             </div>
           ) : (
@@ -90,9 +90,9 @@ export default function SignUpPage() {
               </Button>
 
               <div className="relative flex items-center gap-3">
-                <div className="flex-1 border-t border-white/[0.08]" />
-                <span className="text-xs text-[#888891]">or</span>
-                <div className="flex-1 border-t border-white/[0.08]" />
+                <div className="flex-1 border-t border-line" />
+                <span className="text-xs text-muted">or</span>
+                <div className="flex-1 border-t border-line" />
               </div>
 
               <form onSubmit={handleSignUp} className="space-y-4">
@@ -128,7 +128,7 @@ export default function SignUpPage() {
           )}
         </div>
 
-        <p className="text-center text-sm text-[#888891] mt-6">
+        <p className="text-center text-sm text-muted mt-6">
           Already have an account?{' '}
           <Link href="/auth/signin" className="text-[#7c5cfc] hover:underline">
             Sign in

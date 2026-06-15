@@ -62,7 +62,7 @@ export function EditPresetForm({ preset }: { preset: Preset }) {
 
   return (
     <form onSubmit={handleSave} className="space-y-5">
-      <div className="bg-[#111114] border border-white/[0.08] rounded-2xl p-6 space-y-5">
+      <div className="bg-surface border border-line rounded-2xl p-6 space-y-5">
         <div>
           <Label htmlFor="title" className="mb-1.5">Title *</Label>
           <Input id="title" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} required />
@@ -75,7 +75,7 @@ export function EditPresetForm({ preset }: { preset: Preset }) {
           <div>
             <Label className="mb-1.5">Category</Label>
             <Select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}>
-              {CATEGORIES.map((c) => <option key={c} value={c} className="bg-[#111114]">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+              {CATEGORIES.map((c) => <option key={c} value={c} className="bg-surface">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
             </Select>
           </div>
           <div>

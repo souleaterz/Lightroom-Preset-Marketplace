@@ -23,7 +23,7 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
   return (
     <div
       className={cn(
-        'group relative bg-[#111114] border border-white/[0.08] rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-xl hover:shadow-black/50',
+        'group relative bg-surface border border-line rounded-xl overflow-hidden transition-all duration-300 hover:border-line-strong hover:shadow-xl hover:shadow-black/50',
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
@@ -88,7 +88,7 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
                 e.stopPropagation()
                 onQuickPreview(preset)
               }}
-              className="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-all"
+              className="bg-overlay-strong backdrop-blur-sm border border-line-strong text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-all"
             >
               Quick Preview
             </button>
@@ -115,7 +115,7 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
 
         {/* Category badge */}
         {preset.category && (
-          <div className="absolute top-2 left-2 text-xs font-medium text-[#888891] bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded capitalize">
+          <div className="absolute top-2 left-2 text-xs font-medium text-muted bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded capitalize">
             {preset.category}
           </div>
         )}
@@ -124,7 +124,7 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
       {/* Card content */}
       <div className="p-4">
         <Link href={`/preset/${preset.id}`}>
-          <h3 className="font-semibold text-[#f0f0f0] truncate hover:text-white transition-colors mb-1">
+          <h3 className="font-semibold text-foreground truncate hover:text-white transition-colors mb-1">
             {preset.title}
           </h3>
         </Link>
@@ -132,7 +132,7 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
         {preset.profiles && (
           <Link
             href={`/seller/${preset.profiles.username}`}
-            className="text-sm text-[#888891] hover:text-[#f0f0f0] transition-colors truncate block mb-2"
+            className="text-sm text-muted hover:text-foreground transition-colors truncate block mb-2"
           >
             {preset.profiles.display_name || preset.profiles.username}
           </Link>
@@ -141,14 +141,14 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm text-[#888891]">
+            <span className="text-sm text-muted">
               {preset.rating_avg > 0 ? preset.rating_avg.toFixed(1) : 'New'}
               {preset.rating_count > 0 && (
                 <span className="text-xs ml-1">({preset.rating_count})</span>
               )}
             </span>
           </div>
-          <span className="font-mono font-semibold text-[#f0f0f0]">
+          <span className="font-mono font-semibold text-foreground">
             {formatPrice(preset.price_cents)}
           </span>
         </div>

@@ -141,8 +141,8 @@ export default async function PresetPage({ params }: Props) {
             {/* Description */}
             {preset.description && (
               <div>
-                <h2 className="text-lg font-semibold text-[#f0f0f0] mb-3">About this preset</h2>
-                <p className="text-[#888891] leading-relaxed whitespace-pre-line">
+                <h2 className="text-lg font-semibold text-foreground mb-3">About this preset</h2>
+                <p className="text-muted leading-relaxed whitespace-pre-line">
                   {preset.description}
                 </p>
               </div>
@@ -151,11 +151,11 @@ export default async function PresetPage({ params }: Props) {
             {/* What's included */}
             {preset.whats_included && (
               <div>
-                <h2 className="text-lg font-semibold text-[#f0f0f0] mb-3 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                   <Package className="h-5 w-5 text-[#7c5cfc]" />
                   What&apos;s included
                 </h2>
-                <p className="text-[#888891] leading-relaxed whitespace-pre-line">
+                <p className="text-muted leading-relaxed whitespace-pre-line">
                   {preset.whats_included}
                 </p>
               </div>
@@ -164,11 +164,11 @@ export default async function PresetPage({ params }: Props) {
             {/* Tags */}
             {preset.tags && preset.tags.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-[#888891] mb-3">Tags</h3>
+                <h3 className="text-sm font-medium text-muted mb-3">Tags</h3>
                 <div className="flex flex-wrap gap-2">
                   {preset.tags.map((tag) => (
                     <Link key={tag} href={`/browse?tag=${encodeURIComponent(tag)}`}>
-                      <Badge variant="secondary" className="cursor-pointer hover:border-white/20 transition-colors">
+                      <Badge variant="secondary" className="cursor-pointer hover:border-line-strong transition-colors">
                         {tag}
                       </Badge>
                     </Link>
@@ -180,8 +180,8 @@ export default async function PresetPage({ params }: Props) {
             {/* About the author */}
             {preset.profiles && (
               <div>
-                <h2 className="text-lg font-semibold text-[#f0f0f0] mb-3">About the author</h2>
-                <div className="bg-[#111114] border border-white/[0.08] rounded-2xl p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-3">About the author</h2>
+                <div className="bg-surface border border-line rounded-2xl p-6">
                   <div className="flex items-start gap-4">
                     <Link
                       href={`/seller/${preset.profiles.username}`}
@@ -205,34 +205,34 @@ export default async function PresetPage({ params }: Props) {
                     <div className="flex-1 min-w-0">
                       <Link
                         href={`/seller/${preset.profiles.username}`}
-                        className="font-semibold text-[#f0f0f0] hover:text-[#7c5cfc] transition-colors"
+                        className="font-semibold text-foreground hover:text-[#7c5cfc] transition-colors"
                       >
                         {preset.profiles.display_name || preset.profiles.username}
                       </Link>
-                      <p className="text-xs text-[#888891]">@{preset.profiles.username}</p>
+                      <p className="text-xs text-muted">@{preset.profiles.username}</p>
 
                       {/* Author rating + stats */}
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm">
                         {sellerStats && sellerStats.totalReviews > 0 && (
                           <span className="flex items-center gap-1.5">
                             <StarRating value={Math.round(sellerStats.avg)} size="sm" />
-                            <span className="text-[#888891]">
+                            <span className="text-muted">
                               {sellerStats.avg.toFixed(1)} ({sellerStats.totalReviews} review{sellerStats.totalReviews === 1 ? '' : 's'})
                             </span>
                           </span>
                         )}
                         {sellerStats && (
-                          <span className="text-[#888891]">
+                          <span className="text-muted">
                             {sellerStats.presetCount} preset{sellerStats.presetCount === 1 ? '' : 's'}
                           </span>
                         )}
                         {typeof preset.profiles.total_sales === 'number' && preset.profiles.total_sales > 0 && (
-                          <span className="text-[#888891]">{preset.profiles.total_sales} sales</span>
+                          <span className="text-muted">{preset.profiles.total_sales} sales</span>
                         )}
                       </div>
 
                       {preset.profiles.bio && (
-                        <p className="text-sm text-[#888891] leading-relaxed mt-3 whitespace-pre-line">
+                        <p className="text-sm text-muted leading-relaxed mt-3 whitespace-pre-line">
                           {preset.profiles.bio}
                         </p>
                       )}
@@ -251,10 +251,10 @@ export default async function PresetPage({ params }: Props) {
 
             {/* Reviews */}
             <div>
-              <h2 className="text-lg font-semibold text-[#f0f0f0] mb-6">
+              <h2 className="text-lg font-semibold text-foreground mb-6">
                 Reviews
                 {reviews.length > 0 && (
-                  <span className="ml-2 text-base font-normal text-[#888891]">({reviews.length})</span>
+                  <span className="ml-2 text-base font-normal text-muted">({reviews.length})</span>
                 )}
               </h2>
               <ReviewSection
@@ -269,7 +269,7 @@ export default async function PresetPage({ params }: Props) {
 
           {/* Right: info panel */}
           <div className="lg:sticky lg:top-20 lg:self-start space-y-5">
-            <div className="bg-[#111114] border border-white/[0.08] rounded-2xl p-6 space-y-5">
+            <div className="bg-surface border border-line rounded-2xl p-6 space-y-5">
               {/* Header */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
@@ -278,7 +278,7 @@ export default async function PresetPage({ params }: Props) {
                   )}
                   <Badge variant="outline" className="font-mono text-xs">.{fileExt}</Badge>
                 </div>
-                <h1 className="text-xl font-semibold text-[#f0f0f0] leading-snug mb-3">
+                <h1 className="text-xl font-semibold text-foreground leading-snug mb-3">
                   {preset.title}
                 </h1>
 
@@ -303,7 +303,7 @@ export default async function PresetPage({ params }: Props) {
                         </span>
                       )}
                     </div>
-                    <span className="text-sm text-[#888891] group-hover:text-[#f0f0f0] transition-colors">
+                    <span className="text-sm text-muted group-hover:text-foreground transition-colors">
                       {preset.profiles.display_name || preset.profiles.username}
                     </span>
                   </Link>
@@ -314,7 +314,7 @@ export default async function PresetPage({ params }: Props) {
               {preset.rating_count > 0 && (
                 <div className="flex items-center gap-2">
                   <StarRating value={Math.round(preset.rating_avg)} size="sm" />
-                  <span className="text-sm text-[#888891]">
+                  <span className="text-sm text-muted">
                     {preset.rating_avg.toFixed(1)} ({preset.rating_count} reviews)
                   </span>
                 </div>
@@ -322,10 +322,10 @@ export default async function PresetPage({ params }: Props) {
 
               {/* Price */}
               <div className="flex items-baseline gap-2">
-                <span className="font-mono text-3xl font-bold text-[#f0f0f0]">
+                <span className="font-mono text-3xl font-bold text-foreground">
                   {formatPrice(preset.price_cents)}
                 </span>
-                <span className="text-sm text-[#888891]">one-time</span>
+                <span className="text-sm text-muted">one-time</span>
               </div>
 
               {/* CTA */}
@@ -334,7 +334,7 @@ export default async function PresetPage({ params }: Props) {
                   <Button className="w-full" size="lg" disabled>
                     Demo preset — not for sale
                   </Button>
-                  <p className="text-xs text-center text-[#888891]">
+                  <p className="text-xs text-center text-muted">
                     A sample listing showcasing how presets appear on PresetScout.
                   </p>
                 </div>
@@ -346,7 +346,7 @@ export default async function PresetPage({ params }: Props) {
                       Download Preset
                     </Button>
                   </a>
-                  <p className="text-xs text-center text-[#888891]">
+                  <p className="text-xs text-center text-muted">
                     Purchased {formatDate(userPurchase.created_at)}
                   </p>
                 </div>
@@ -356,24 +356,24 @@ export default async function PresetPage({ params }: Props) {
 
               {/* Pack size */}
               {preset.preset_count ? (
-                <div className="flex items-center gap-2 text-sm text-[#f0f0f0]">
+                <div className="flex items-center gap-2 text-sm text-foreground">
                   <Layers className="h-4 w-4 text-[#7c5cfc]" />
                   <span className="font-medium">{preset.preset_count}</span>
-                  <span className="text-[#888891]">presets in this pack</span>
+                  <span className="text-muted">presets in this pack</span>
                 </div>
               ) : null}
 
               {/* Compatibility */}
-              <div className="pt-2 border-t border-white/[0.06] space-y-3">
-                <h3 className="text-xs font-semibold text-[#888891] uppercase tracking-wider">
+              <div className="pt-2 border-t border-line space-y-3">
+                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">
                   Compatible with
                 </h3>
                 {(preset.compatible_with && preset.compatible_with.length > 0
                   ? preset.compatible_with
                   : ['Lightroom Classic', 'Lightroom CC', 'Lightroom Mobile']
                 ).map((label) => (
-                  <div key={label} className="flex items-center gap-2 text-sm text-[#888891]">
-                    <div className="w-5 h-5 rounded bg-white/5 flex items-center justify-center">
+                  <div key={label} className="flex items-center gap-2 text-sm text-muted">
+                    <div className="w-5 h-5 rounded bg-overlay flex items-center justify-center">
                       <Monitor className="h-3 w-3" />
                     </div>
                     {label}
@@ -382,13 +382,13 @@ export default async function PresetPage({ params }: Props) {
               </div>
 
               {/* File info */}
-              <div className="flex items-center gap-2 text-xs text-[#888891]">
+              <div className="flex items-center gap-2 text-xs text-muted">
                 <FileCode2 className="h-3.5 w-3.5" />
                 <span className="font-mono">{preset.file_name}</span>
               </div>
 
               {/* Download count */}
-              <div className="text-xs text-[#888891]">
+              <div className="text-xs text-muted">
                 <Download className="h-3.5 w-3.5 inline mr-1" />
                 {preset.downloads.toLocaleString()} downloads
               </div>
@@ -399,7 +399,7 @@ export default async function PresetPage({ params }: Props) {
         {/* Related presets */}
         {related.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-xl font-semibold text-[#f0f0f0] mb-6">Related Presets</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-6">Related Presets</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {related.map((rel) => (
                 <PresetCard key={rel.id} preset={rel} />

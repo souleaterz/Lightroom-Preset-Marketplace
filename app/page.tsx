@@ -36,12 +36,12 @@ export default async function HomePage() {
               <span>A curated marketplace for Lightroom presets</span>
             </div>
 
-            <h1 className="font-serif text-5xl sm:text-6xl lg:text-[5.25rem] leading-[1.02] text-[#f0f0f0] mb-6">
+            <h1 className="font-serif text-5xl sm:text-6xl lg:text-[5.25rem] leading-[1.02] text-foreground mb-6">
               Your photos,{' '}
               <span className="gradient-text">transformed.</span>
             </h1>
 
-            <p className="text-lg text-[#9a9aa3] max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
+            <p className="text-lg text-muted max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
               Discover hand-crafted presets from independent creators. Drag to preview the exact
               look on real photos, buy once with a tap, and it&apos;s yours forever.
             </p>
@@ -61,7 +61,7 @@ export default async function HomePage() {
             </div>
 
             {/* Trust row — no fabricated numbers */}
-            <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm text-[#888891]">
+            <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm text-muted">
               {[
                 { icon: Eye, label: 'Preview before you buy' },
                 { icon: Download, label: 'Instant download' },
@@ -78,7 +78,7 @@ export default async function HomePage() {
           {/* Right: interactive before/after showcase */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
             <HeroShowcase src={HERO_PHOTO} />
-            <p className="mt-4 text-center text-sm text-[#888891]">
+            <p className="mt-4 text-center text-sm text-muted">
               <span className="text-[#cbb9ff]">Drag the slider</span> — every preset previews exactly like this.
             </p>
           </div>

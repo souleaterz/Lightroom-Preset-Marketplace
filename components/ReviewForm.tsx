@@ -50,8 +50,8 @@ export function ReviewForm({ presetId, purchaseId, onSuccess }: ReviewFormProps)
   if (submitted) {
     return (
       <div className="p-6 bg-[#7c5cfc]/10 border border-[#7c5cfc]/20 rounded-xl text-center">
-        <p className="text-[#f0f0f0] font-medium">Thank you for your review!</p>
-        <p className="text-sm text-[#888891] mt-1">Your feedback helps other photographers.</p>
+        <p className="text-foreground font-medium">Thank you for your review!</p>
+        <p className="text-sm text-muted mt-1">Your feedback helps other photographers.</p>
       </div>
     )
   }

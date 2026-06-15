@@ -86,8 +86,8 @@ export function AccountForm({ profile }: { profile: Profile | null }) {
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
-      <div className="bg-[#111114] border border-white/[0.08] rounded-2xl p-6 space-y-5">
-        <h2 className="font-semibold text-[#f0f0f0]">Profile</h2>
+      <div className="bg-surface border border-line rounded-2xl p-6 space-y-5">
+        <h2 className="font-semibold text-foreground">Profile</h2>
 
         {/* Avatar */}
         <div className="flex items-center gap-4">
@@ -116,7 +116,7 @@ export function AccountForm({ profile }: { profile: Profile | null }) {
               {avatarUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
               {avatarUploading ? 'Uploading…' : 'Upload avatar'}
             </Button>
-            <p className="text-xs text-[#888891] mt-1.5">JPG, PNG or WebP, max 5 MB.</p>
+            <p className="text-xs text-muted mt-1.5">JPG, PNG or WebP, max 5 MB.</p>
           </div>
         </div>
 
@@ -132,7 +132,7 @@ export function AccountForm({ profile }: { profile: Profile | null }) {
         <div>
           <Label htmlFor="username" className="mb-1.5">Username</Label>
           <div className="flex items-center gap-0">
-            <span className="flex h-11 items-center px-3 rounded-l-lg border border-r-0 border-white/10 bg-white/[0.02] text-[#888891] text-sm">
+            <span className="flex h-11 items-center px-3 rounded-l-lg border border-r-0 border-line bg-overlay text-muted text-sm">
               presetscout.com/seller/
             </span>
             <Input
