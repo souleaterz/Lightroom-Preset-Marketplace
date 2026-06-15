@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { StarRating } from '@/components/StarRating'
 import { createClient } from '@/lib/supabase/server'
-import { formatPresetPrice, formatDate, isDemoPreset, isFreePreset } from '@/lib/utils'
+import { formatPrice, formatPresetPrice, formatDate, isDemoPreset, isFreePreset, isBundle } from '@/lib/utils'
 import { siteConfig } from '@/lib/site'
 import type { Preset, Review, Purchase } from '@/types/database'
 import { PurchaseButton } from './PurchaseButton'
@@ -41,6 +41,18 @@ async function getReviews(presetId: string) {
     .eq('preset_id', presetId)
     .order('created_at', { ascending: false })
   return (data as Review[]) || []
+}
+
+async function getBundleItems(ids: string[]) {
+  if (!ids.length) return []
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('presets')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url)')
+    .in('id', ids)
+  // Preserve the seller's chosen ordering.
+  const rows = (data as Preset[]) || []
+  return ids.map((id) => rows.find((r) => r.id === id)).filter((p): p is Preset => !!p)
 }
 
 async function getRelated(preset: Preset) {
@@ -104,12 +116,18 @@ export default async function PresetPage({ params }: Props) {
 
   if (!preset) notFound()
 
-  const related = await getRelated(preset)
+  const bundle = isBundle(preset)
+  const [related, bundleItems] = await Promise.all([
+    getRelated(preset),
+    bundle ? getBundleItems(preset.bundle_preset_ids || []) : Promise.resolve([] as Preset[]),
+  ])
   const sellerStats = preset.seller_id ? await getSellerStats(preset.seller_id) : null
-  const fileExt = preset.file_name.split('.').pop()?.toUpperCase() || 'XMP'
+  const fileExt = preset.file_name?.split('.').pop()?.toUpperCase() || 'XMP'
   const demoPairs = preset.additional_demo_pairs || []
   const demo = isDemoPreset(preset)
   const free = isFreePreset(preset)
+  const individualTotal = bundleItems.reduce((s, p) => s + p.price_cents, 0)
+  const bundleSavings = individualTotal > preset.price_cents ? individualTotal - preset.price_cents : 0
 
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -191,6 +209,27 @@ export default async function PresetPage({ params }: Props) {
                 </div>
               )}
             </div>
+
+            {/* What's in this bundle */}
+            {bundle && bundleItems.length > 0 && (
+              <div>
+                <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <Package className="h-5 w-5 text-[#7c5cfc]" />
+                  What&apos;s in this bundle
+                  <span className="text-base font-normal text-muted">({bundleItems.length})</span>
+                </h2>
+                {bundleSavings > 0 && (
+                  <p className="text-sm text-green-400 mb-4">
+                    Buy together and save {formatPrice(bundleSavings)} vs {formatPrice(individualTotal)} individually.
+                  </p>
+                )}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {bundleItems.map((item) => (
+                    <PresetCard key={item.id} preset={item} />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Description */}
             {preset.description && (
@@ -330,7 +369,13 @@ export default async function PresetPage({ params }: Props) {
                   {preset.category && (
                     <Badge variant="secondary" className="capitalize">{preset.category}</Badge>
                   )}
-                  <Badge variant="outline" className="font-mono text-xs">.{fileExt}</Badge>
+                  {bundle ? (
+                    <Badge variant="outline" className="text-xs border-[#7c5cfc]/40 text-[#7c5cfc]">
+                      Bundle · {bundleItems.length} presets
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="font-mono text-xs">.{fileExt}</Badge>
+                  )}
                 </div>
                 <h1 className="text-xl font-semibold text-foreground leading-snug mb-3">
                   {preset.title}
@@ -375,11 +420,22 @@ export default async function PresetPage({ params }: Props) {
               )}
 
               {/* Price */}
-              <div className="flex items-baseline gap-2">
-                <span className="font-mono text-3xl font-bold text-foreground">
-                  {formatPresetPrice(preset.price_cents)}
-                </span>
-                {!free && <span className="text-sm text-muted">one-time</span>}
+              <div className="space-y-1">
+                <div className="flex items-baseline gap-2">
+                  <span className="font-mono text-3xl font-bold text-foreground">
+                    {formatPresetPrice(preset.price_cents)}
+                  </span>
+                  {bundle && bundleSavings > 0 ? (
+                    <span className="text-sm text-muted line-through font-mono">
+                      {formatPrice(individualTotal)}
+                    </span>
+                  ) : !free ? (
+                    <span className="text-sm text-muted">one-time</span>
+                  ) : null}
+                </div>
+                {bundle && bundleSavings > 0 && (
+                  <p className="text-sm text-green-400">Save {formatPrice(bundleSavings)} with this bundle</p>
+                )}
               </div>
 
               {/* CTA */}
@@ -393,17 +449,33 @@ export default async function PresetPage({ params }: Props) {
                   </p>
                 </div>
               ) : userPurchase ? (
-                <div className="space-y-3">
-                  <a href={`/api/download/${userPurchase.id}`}>
-                    <Button className="w-full" size="lg">
-                      <Download className="h-4 w-4" />
-                      Download Preset
-                    </Button>
-                  </a>
-                  <p className="text-xs text-center text-muted">
-                    {free ? 'Yours' : 'Purchased'} {formatDate(userPurchase.created_at)}
-                  </p>
-                </div>
+                bundle ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted">
+                      {free ? 'Yours' : 'Purchased'} {formatDate(userPurchase.created_at)} — download each preset:
+                    </p>
+                    {bundleItems.map((item) => (
+                      <a key={item.id} href={`/api/download/${userPurchase.id}?preset=${item.id}`}>
+                        <Button variant="outline" className="w-full justify-start" size="sm">
+                          <Download className="h-3.5 w-3.5" />
+                          <span className="truncate">{item.title}</span>
+                        </Button>
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <a href={`/api/download/${userPurchase.id}`}>
+                      <Button className="w-full" size="lg">
+                        <Download className="h-4 w-4" />
+                        Download Preset
+                      </Button>
+                    </a>
+                    <p className="text-xs text-center text-muted">
+                      {free ? 'Yours' : 'Purchased'} {formatDate(userPurchase.created_at)}
+                    </p>
+                  </div>
+                )
               ) : free ? (
                 <ClaimFreeButton preset={preset} />
               ) : (
@@ -438,10 +510,12 @@ export default async function PresetPage({ params }: Props) {
               </div>
 
               {/* File info */}
-              <div className="flex items-center gap-2 text-xs text-muted">
-                <FileCode2 className="h-3.5 w-3.5" />
-                <span className="font-mono">{preset.file_name}</span>
-              </div>
+              {preset.file_name && (
+                <div className="flex items-center gap-2 text-xs text-muted">
+                  <FileCode2 className="h-3.5 w-3.5" />
+                  <span className="font-mono">{preset.file_name}</span>
+                </div>
+              )}
 
               {/* Download count */}
               <div className="text-xs text-muted">

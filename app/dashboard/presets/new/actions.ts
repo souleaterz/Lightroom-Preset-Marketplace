@@ -54,8 +54,8 @@ export interface PublishPresetInput {
   before_image_url: string
   after_image_url: string
   additional_demo_pairs: { before: string; after: string }[] | null
-  file_path: string
-  file_name: string
+  file_path: string | null
+  file_name: string | null
   compatible_with: string[] | null
   whats_included: string | null
   preset_count: number | null

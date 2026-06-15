@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Download, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { isBundle } from '@/lib/utils'
 import type { Preset } from '@/types/database'
 
 interface ClaimFreeButtonProps {
@@ -33,8 +34,11 @@ export function ClaimFreeButton({ preset }: ClaimFreeButtonProps) {
         throw new Error(data.error || 'Failed to claim preset')
       }
       if (data.purchase_id) {
-        // Trigger the download, then refresh so the page shows the owned state.
-        window.location.href = `/api/download/${data.purchase_id}`
+        // Bundles have no single file — just reveal the per-preset download list.
+        // Single presets download straight away.
+        if (!isBundle(preset)) {
+          window.location.href = `/api/download/${data.purchase_id}`
+        }
         router.refresh()
       }
     } catch (err: unknown) {

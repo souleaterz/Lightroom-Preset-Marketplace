@@ -2,7 +2,7 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Plus } from 'lucide-react'
+import { Plus, Package } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -35,12 +35,20 @@ export default async function ManagePresetsPage() {
             <h1 className="text-3xl font-semibold text-foreground">My Presets</h1>
             <p className="text-muted mt-1">{presets.length} preset{presets.length !== 1 ? 's' : ''}</p>
           </div>
-          <Link href="/dashboard/presets/new">
-            <Button>
-              <Plus className="h-4 w-4" />
-              New Preset
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/bundles/new">
+              <Button variant="outline">
+                <Package className="h-4 w-4" />
+                New Bundle
+              </Button>
+            </Link>
+            <Link href="/dashboard/presets/new">
+              <Button>
+                <Plus className="h-4 w-4" />
+                New Preset
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {presets.length === 0 ? (

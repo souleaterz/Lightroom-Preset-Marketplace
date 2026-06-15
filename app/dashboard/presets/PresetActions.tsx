@@ -7,6 +7,7 @@ import { Edit, Eye, EyeOff, Trash2, Loader2, Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { deletePreset } from './actions'
+import { isBundle } from '@/lib/utils'
 import type { Preset } from '@/types/database'
 
 export function PresetActions({ preset }: { preset: Preset }) {
@@ -76,11 +77,14 @@ export function PresetActions({ preset }: { preset: Preset }) {
 
   return (
     <div className="flex items-center gap-1 flex-shrink-0">
-      <Link href={`/dashboard/presets/${preset.id}/edit`}>
-        <Button size="icon" variant="ghost" className="h-9 w-9" aria-label="Edit preset">
-          <Edit className="h-4 w-4" />
-        </Button>
-      </Link>
+      {/* Bundles have no single-file editor yet; publish/delete still apply. */}
+      {!isBundle(preset) && (
+        <Link href={`/dashboard/presets/${preset.id}/edit`}>
+          <Button size="icon" variant="ghost" className="h-9 w-9" aria-label="Edit preset">
+            <Edit className="h-4 w-4" />
+          </Button>
+        </Link>
+      )}
       <Button
         size="icon"
         variant="ghost"

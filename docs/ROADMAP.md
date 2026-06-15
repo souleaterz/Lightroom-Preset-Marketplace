@@ -11,17 +11,17 @@ ordered roughly by impact-to-effort. Shipped items move to the bottom.
   and compatibility, added to SEO keywords.
 - **Structured data** — `Product` + `Offer` + `AggregateRating` + `Review` JSON-LD
   on preset pages for Google rich results; sitemap already covers presets/blog.
+- **Preset bundles / packs** — a bundle is a `presets` row with `bundle_preset_ids`
+  (migration `0005_bundles.sql`, file fields now nullable). Created at
+  `/dashboard/bundles/new`; reuses checkout; download serves each member file via
+  `/api/download/[purchaseId]?preset=<id>`. Shows savings vs buying individually.
+  *Follow-up:* no bundle editor yet — Edit is hidden for bundles (publish/delete work).
 
 ---
 
 ## Next up (high impact)
 
-### 1. Preset bundles / packs
-Group multiple presets into a discounted pack. Raises average order value.
-- New `bundles` table (or reuse `presets` with a `bundle_preset_ids uuid[]`).
-- Checkout grants download access to all included presets.
-
-### 2. Discount / promo codes
+### 1. Discount / promo codes
 Seller-defined codes (e.g. 20% off). Sellers promote their own codes → free traffic.
 - `discount_codes` table (seller_id, code, percent_off, expires_at, max_uses).
 - Apply in `/api/checkout` via Stripe `discounts`.

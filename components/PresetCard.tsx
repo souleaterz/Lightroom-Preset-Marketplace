@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Star, Heart } from 'lucide-react'
-import { cn, formatPresetPrice, isDemoPreset } from '@/lib/utils'
+import { cn, formatPresetPrice, isDemoPreset, isBundle } from '@/lib/utils'
 import { useWishlist } from '@/components/WishlistProvider'
 import type { Preset } from '@/types/database'
 
@@ -19,6 +19,7 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
   const { isWishlisted: checkWishlisted, toggle } = useWishlist()
   const isWishlisted = checkWishlisted(preset.id)
   const demo = isDemoPreset(preset)
+  const bundle = isBundle(preset)
 
   return (
     <div
@@ -113,12 +114,19 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
           <Heart className={cn('h-4 w-4', isWishlisted && 'fill-[#e05c7a]')} />
         </button>
 
-        {/* Category badge */}
-        {preset.category && (
-          <div className="absolute top-2 left-2 text-xs font-medium text-muted bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded capitalize">
-            {preset.category}
-          </div>
-        )}
+        {/* Category / bundle badge */}
+        <div className="absolute top-2 left-2 flex items-center gap-1.5">
+          {bundle && (
+            <span className="text-xs font-semibold text-white bg-[#7c5cfc] px-2 py-0.5 rounded">
+              Bundle · {preset.bundle_preset_ids?.length}
+            </span>
+          )}
+          {preset.category && (
+            <span className="text-xs font-medium text-muted bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded capitalize">
+              {preset.category}
+            </span>
+          )}
+        </div>
       </Link>
 
       {/* Card content */}

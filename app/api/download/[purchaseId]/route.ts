@@ -7,7 +7,7 @@ const rateLimitMap = new Map<string, number>()
 const RATE_LIMIT_MS = 10_000
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: { purchaseId: string } }
 ) {
   try {
@@ -18,18 +18,21 @@ export async function GET(
     }
 
     const { purchaseId } = params
+    // Optional: download a specific preset that belongs to a purchased bundle.
+    const memberId = new URL(request.url).searchParams.get('preset')
 
-    // Rate limit
-    const lastRequest = rateLimitMap.get(`${user.id}:${purchaseId}`)
+    // Rate limit (keyed by the specific file being requested).
+    const rateKey = `${user.id}:${purchaseId}:${memberId || 'main'}`
+    const lastRequest = rateLimitMap.get(rateKey)
     if (lastRequest && Date.now() - lastRequest < RATE_LIMIT_MS) {
       return NextResponse.json({ error: 'Rate limited. Please wait.' }, { status: 429 })
     }
-    rateLimitMap.set(`${user.id}:${purchaseId}`, Date.now())
+    rateLimitMap.set(rateKey, Date.now())
 
     // Verify purchase belongs to user
     const { data: purchase } = await supabase
       .from('purchases')
-      .select('*, presets(file_path, file_name)')
+      .select('*, presets(file_path, file_name, bundle_preset_ids)')
       .eq('id', purchaseId)
       .eq('buyer_id', user.id)
       .eq('status', 'succeeded')
@@ -39,17 +42,39 @@ export async function GET(
       return NextResponse.json({ error: 'Purchase not found' }, { status: 404 })
     }
 
-    const preset = (purchase as Record<string, unknown> & { presets?: { file_path: string; file_name: string } }).presets
-    if (!preset?.file_path) {
+    const purchased = (purchase as Record<string, unknown> & {
+      presets?: { file_path: string | null; file_name: string | null; bundle_preset_ids: string[] | null }
+    }).presets
+
+    const adminSupabase = createAdminClient()
+
+    // Resolve which file to serve: a bundle member, or the preset's own file.
+    let filePath: string | null | undefined = purchased?.file_path
+    let fileName: string | null | undefined = purchased?.file_name
+
+    if (memberId) {
+      const bundleIds = purchased?.bundle_preset_ids || []
+      if (!bundleIds.includes(memberId)) {
+        return NextResponse.json({ error: 'Preset not part of this purchase' }, { status: 403 })
+      }
+      const { data: member } = await adminSupabase
+        .from('presets')
+        .select('file_path, file_name')
+        .eq('id', memberId)
+        .single()
+      filePath = member?.file_path
+      fileName = member?.file_name
+    }
+
+    if (!filePath) {
       return NextResponse.json({ error: 'File not found' }, { status: 404 })
     }
 
     // Generate signed URL (60 seconds)
-    const adminSupabase = createAdminClient()
     const { data, error } = await adminSupabase.storage
       .from('preset-files')
-      .createSignedUrl(preset.file_path, 60, {
-        download: preset.file_name,
+      .createSignedUrl(filePath, 60, {
+        download: fileName || undefined,
       })
 
     if (error || !data?.signedUrl) {

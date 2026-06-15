@@ -22,6 +22,11 @@ export function isFreePreset(preset: { price_cents: number }): boolean {
   return preset.price_cents <= 0
 }
 
+/** A bundle is a preset row that groups other presets into a discounted pack. */
+export function isBundle(preset: { bundle_preset_ids?: string[] | null }): boolean {
+  return !!preset.bundle_preset_ids && preset.bundle_preset_ids.length > 0
+}
+
 export function formatDate(dateString: string): string {
   return new Intl.DateTimeFormat('en-GB', {
     year: 'numeric',
