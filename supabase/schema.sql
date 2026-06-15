@@ -59,7 +59,7 @@ create table if not exists purchases (
 create table if not exists reviews (
   id uuid primary key default gen_random_uuid(),
   buyer_id uuid references profiles(id),
-  preset_id uuid references presets(id),
+  preset_id uuid references presets(id) on delete cascade,
   purchase_id uuid references purchases(id),
   rating integer check (rating between 1 and 5),
   body text,
@@ -70,7 +70,7 @@ create table if not exists reviews (
 -- Wishlists
 create table if not exists wishlists (
   user_id uuid references profiles(id),
-  preset_id uuid references presets(id),
+  preset_id uuid references presets(id) on delete cascade,
   created_at timestamptz default now(),
   primary key (user_id, preset_id)
 );

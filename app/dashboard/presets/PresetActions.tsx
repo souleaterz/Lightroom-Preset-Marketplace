@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Edit, Eye, EyeOff, Trash2, Loader2, Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
+import { deletePreset } from './actions'
 import type { Preset } from '@/types/database'
 
 export function PresetActions({ preset }: { preset: Preset }) {
@@ -26,13 +27,15 @@ export function PresetActions({ preset }: { preset: Preset }) {
 
   // Inline confirm instead of window.confirm(), which is unreliable in mobile
   // in-app browsers (Instagram/Facebook webviews silently swallow it).
-  const deletePreset = async () => {
+  // Deletion runs server-side so it can clear FK-linked rows (wishlists,
+  // reviews) with admin privileges.
+  const handleDelete = async () => {
     setLoading('delete')
-    const { error } = await supabase.from('presets').delete().eq('id', preset.id)
+    const res = await deletePreset(preset.id)
     setConfirming(false)
-    if (error) {
+    if (res.error) {
       setLoading(null)
-      alert(`Could not delete preset: ${error.message}`)
+      alert(res.error)
       return
     }
     router.refresh()
@@ -47,7 +50,7 @@ export function PresetActions({ preset }: { preset: Preset }) {
           size="icon"
           variant="ghost"
           className="h-9 w-9 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-          onClick={deletePreset}
+          onClick={handleDelete}
           disabled={loading === 'delete'}
           aria-label="Confirm delete"
         >
