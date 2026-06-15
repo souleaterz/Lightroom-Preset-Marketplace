@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Star, Heart } from 'lucide-react'
-import { cn, formatPrice, isDemoPreset } from '@/lib/utils'
+import { cn, formatPresetPrice, isDemoPreset } from '@/lib/utils'
 import { useWishlist } from '@/components/WishlistProvider'
 import type { Preset } from '@/types/database'
 
@@ -148,8 +148,11 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
               )}
             </span>
           </div>
-          <span className="font-mono font-semibold text-foreground">
-            {formatPrice(preset.price_cents)}
+          <span className={cn(
+            'font-mono font-semibold',
+            preset.price_cents <= 0 ? 'text-[#7c5cfc]' : 'text-foreground'
+          )}>
+            {formatPresetPrice(preset.price_cents)}
           </span>
         </div>
       </div>

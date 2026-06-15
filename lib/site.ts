@@ -12,9 +12,12 @@ export const siteConfig = {
     'lightroom presets marketplace',
     'buy lightroom presets',
     'sell lightroom presets',
+    'free lightroom presets',
     'photo editing presets',
     'xmp presets',
+    'dng presets',
     'mobile lightroom presets',
+    'lightroom mobile presets',
   ],
 }
 

@@ -12,6 +12,16 @@ export function formatPrice(cents: number): string {
   }).format(cents / 100)
 }
 
+/** Like formatPrice, but shows "Free" for £0 presets. Use for listing prices. */
+export function formatPresetPrice(cents: number): string {
+  return cents <= 0 ? 'Free' : formatPrice(cents)
+}
+
+/** A preset with a £0 price that buyers can claim without checkout. */
+export function isFreePreset(preset: { price_cents: number }): boolean {
+  return preset.price_cents <= 0
+}
+
 export function formatDate(dateString: string): string {
   return new Intl.DateTimeFormat('en-GB', {
     year: 'numeric',

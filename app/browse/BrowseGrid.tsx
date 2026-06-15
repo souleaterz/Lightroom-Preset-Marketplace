@@ -18,6 +18,9 @@ async function getPresets(params: BrowseGridProps['searchParams']): Promise<Pres
     if (params.category && params.category !== 'all') {
       query = query.eq('category', params.category)
     }
+    if (params.free === '1') {
+      query = query.eq('price_cents', 0)
+    }
     if (params.min_price) {
       query = query.gte('price_cents', parseInt(params.min_price) * 100)
     }

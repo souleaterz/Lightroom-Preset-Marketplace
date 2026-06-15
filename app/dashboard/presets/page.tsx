@@ -7,7 +7,7 @@ import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/server'
-import { formatPrice, formatDate } from '@/lib/utils'
+import { formatPresetPrice, formatDate } from '@/lib/utils'
 import type { Preset } from '@/types/database'
 import { PresetActions } from './PresetActions'
 
@@ -73,7 +73,7 @@ export default async function ManagePresetsPage() {
                     </Badge>
                   </div>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted">
-                    <span className="font-mono">{formatPrice(preset.price_cents)}</span>
+                    <span className="font-mono">{formatPresetPrice(preset.price_cents)}</span>
                     <span>{preset.downloads} downloads</span>
                     <span>{preset.rating_count > 0 ? `${preset.rating_avg.toFixed(1)}★` : 'No reviews'}</span>
                     <span className="hidden sm:inline">{formatDate(preset.created_at)}</span>

@@ -9,9 +9,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { StarRating } from '@/components/StarRating'
 import { createClient } from '@/lib/supabase/server'
-import { formatPrice, formatDate, isDemoPreset } from '@/lib/utils'
+import { formatPresetPrice, formatDate, isDemoPreset, isFreePreset } from '@/lib/utils'
+import { siteConfig } from '@/lib/site'
 import type { Preset, Review, Purchase } from '@/types/database'
 import { PurchaseButton } from './PurchaseButton'
+import { ClaimFreeButton } from './ClaimFreeButton'
 import { ReviewSection } from './ReviewSection'
 import { DemoGalleryClient } from './DemoGalleryClient'
 
@@ -107,12 +109,64 @@ export default async function PresetPage({ params }: Props) {
   const fileExt = preset.file_name.split('.').pop()?.toUpperCase() || 'XMP'
   const demoPairs = preset.additional_demo_pairs || []
   const demo = isDemoPreset(preset)
+  const free = isFreePreset(preset)
 
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Product structured data for rich results in search (skipped for demo listings).
+  const productLd = demo
+    ? null
+    : {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: preset.title,
+        description: preset.description || `${preset.title} Lightroom preset`,
+        image: [preset.before_image_url, preset.after_image_url],
+        category: preset.category || undefined,
+        brand: preset.profiles
+          ? { '@type': 'Brand', name: preset.profiles.display_name || preset.profiles.username }
+          : undefined,
+        offers: {
+          '@type': 'Offer',
+          price: (preset.price_cents / 100).toFixed(2),
+          priceCurrency: 'GBP',
+          availability: 'https://schema.org/InStock',
+          url: `${siteConfig.url}/preset/${preset.id}`,
+        },
+        ...(preset.rating_count > 0
+          ? {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: preset.rating_avg.toFixed(1),
+                reviewCount: preset.rating_count,
+              },
+            }
+          : {}),
+        ...(reviews.length > 0
+          ? {
+              review: reviews.slice(0, 10).map((r) => ({
+                '@type': 'Review',
+                reviewRating: { '@type': 'Rating', ratingValue: r.rating },
+                author: {
+                  '@type': 'Person',
+                  name: r.profiles?.display_name || r.profiles?.username || 'Verified buyer',
+                },
+                ...(r.body ? { reviewBody: r.body } : {}),
+                datePublished: r.created_at,
+              })),
+            }
+          : {}),
+      }
+
   return (
     <div className="min-h-screen">
+      {productLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }}
+        />
+      )}
       <Navbar user={user} />
 
       <div className="max-w-7xl mx-auto px-4 py-10">
@@ -323,9 +377,9 @@ export default async function PresetPage({ params }: Props) {
               {/* Price */}
               <div className="flex items-baseline gap-2">
                 <span className="font-mono text-3xl font-bold text-foreground">
-                  {formatPrice(preset.price_cents)}
+                  {formatPresetPrice(preset.price_cents)}
                 </span>
-                <span className="text-sm text-muted">one-time</span>
+                {!free && <span className="text-sm text-muted">one-time</span>}
               </div>
 
               {/* CTA */}
@@ -347,9 +401,11 @@ export default async function PresetPage({ params }: Props) {
                     </Button>
                   </a>
                   <p className="text-xs text-center text-muted">
-                    Purchased {formatDate(userPurchase.created_at)}
+                    {free ? 'Yours' : 'Purchased'} {formatDate(userPurchase.created_at)}
                   </p>
                 </div>
+              ) : free ? (
+                <ClaimFreeButton preset={preset} />
               ) : (
                 <PurchaseButton preset={preset} />
               )}

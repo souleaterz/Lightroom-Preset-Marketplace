@@ -25,10 +25,11 @@ export function FilterSidebar() {
   const maxPrice = params.get('max_price') || '100'
   const minRating = params.get('min_rating') || ''
   const sort = params.get('sort') || 'newest'
+  const freeOnly = params.get('free') === '1'
 
   const update = (key: string, value: string) => {
     const p = new URLSearchParams(params.toString())
-    if (value === '' || value === 'all' || (key === 'min_price' && value === '0') || (key === 'max_price' && value === '100')) {
+    if (value === '' || value === 'all' || value === '0' && key === 'free' || (key === 'min_price' && value === '0') || (key === 'max_price' && value === '100')) {
       p.delete(key)
     } else {
       p.set(key, value)
@@ -41,10 +42,32 @@ export function FilterSidebar() {
     router.push('/browse')
   }
 
-  const hasFilters = category !== 'all' || minPrice !== '0' || maxPrice !== '100' || minRating || sort !== 'newest'
+  const hasFilters = category !== 'all' || minPrice !== '0' || maxPrice !== '100' || minRating || sort !== 'newest' || freeOnly
 
   const sidebar = (
     <div className="space-y-6">
+      {/* Free only */}
+      <button
+        onClick={() => update('free', freeOnly ? '0' : '1')}
+        className={cn(
+          'w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all border',
+          freeOnly
+            ? 'bg-[#7c5cfc]/15 text-[#7c5cfc] border-[#7c5cfc]/30'
+            : 'text-muted border-line hover:text-foreground hover:border-line-strong'
+        )}
+      >
+        Free presets only
+        <span className={cn(
+          'w-9 h-5 rounded-full relative transition-colors',
+          freeOnly ? 'bg-[#7c5cfc]' : 'bg-overlay-strong'
+        )}>
+          <span className={cn(
+            'absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all',
+            freeOnly ? 'left-[1.125rem]' : 'left-0.5'
+          )} />
+        </span>
+      </button>
+
       {/* Sort */}
       <div>
         <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">Sort by</h3>
@@ -176,7 +199,7 @@ export function FilterSidebar() {
             Filters
             {hasFilters && (
               <span className="ml-1.5 w-5 h-5 rounded-full bg-[#7c5cfc] text-white text-xs flex items-center justify-center">
-                {[category !== 'all', maxPrice !== '100', !!minRating, sort !== 'newest'].filter(Boolean).length}
+                {[category !== 'all', maxPrice !== '100', !!minRating, sort !== 'newest', freeOnly].filter(Boolean).length}
               </span>
             )}
           </Button>

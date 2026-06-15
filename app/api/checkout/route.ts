@@ -32,6 +32,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'This is a demo preset and is not for sale.' }, { status: 400 })
     }
 
+    if (preset.price_cents <= 0) {
+      return NextResponse.json({ error: 'This preset is free — use /api/claim instead.' }, { status: 400 })
+    }
+
     // Check not already purchased
     const { data: existing } = await supabase
       .from('purchases')

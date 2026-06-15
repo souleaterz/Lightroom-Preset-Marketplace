@@ -28,7 +28,7 @@ create table if not exists presets (
   seller_id uuid references profiles(id) on delete cascade,
   title text not null,
   description text,
-  price_cents integer not null check (price_cents > 0),
+  price_cents integer not null check (price_cents >= 0),
   category text check (category in ('portrait', 'landscape', 'street', 'film', 'moody', 'bright')),
   tags text[],
   before_image_url text not null,

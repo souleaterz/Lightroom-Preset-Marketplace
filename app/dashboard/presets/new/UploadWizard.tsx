@@ -118,7 +118,8 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
       if (!hasBefore || !hasAfter) throw new Error('Before/after images required')
       if (!hasFile) throw new Error('Preset file required')
       if (!data.title) throw new Error('Title required')
-      if (!data.price || isNaN(parseFloat(data.price))) throw new Error('Valid price required')
+      if (data.price === '' || isNaN(parseFloat(data.price)) || parseFloat(data.price) < 0)
+        throw new Error('Valid price required (use 0 for free)')
 
       // 1. Only upload files that were newly selected.
       const fileList: { key: string; bucket: string; ext: string }[] = []
@@ -265,7 +266,8 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
               </div>
               <div>
                 <Label className="mb-1.5">Price (£) *</Label>
-                <Input type="number" min="0.99" step="0.01" placeholder="9.99" value={data.price} onChange={(e) => setData((d) => ({ ...d, price: e.target.value }))} />
+                <Input type="number" min="0" step="0.01" placeholder="9.99" value={data.price} onChange={(e) => setData((d) => ({ ...d, price: e.target.value }))} />
+                <p className="text-xs text-muted mt-1.5">Enter 0 to offer it free — a great way to grow your audience.</p>
               </div>
             </div>
             <div>
@@ -358,7 +360,7 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
                 accept="*"
                 maxSize={50 * 1024 * 1024}
                 label="Drop your preset file or .zip here"
-                hint=".xmp, .lrtemplate, or a .zip with multiple files / a README — up to 50 MB"
+                hint=".xmp, .lrtemplate, .dng (Lightroom Mobile), or a .zip with multiple files / a README — up to 50 MB"
                 onFile={(f) => setData((d) => ({ ...d, presetFile: f }))}
                 file={data.presetFile}
                 onClear={() => setData((d) => ({ ...d, presetFile: null }))}
@@ -436,7 +438,9 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
               </div>
               <div>
                 <p className="text-muted mb-0.5">Price</p>
-                <p className="text-foreground font-mono">£{data.price || '—'}</p>
+                <p className="text-foreground font-mono">
+                  {data.price === '' ? '—' : parseFloat(data.price) === 0 ? 'Free' : `£${data.price}`}
+                </p>
               </div>
               <div>
                 <p className="text-muted mb-0.5">Category</p>
