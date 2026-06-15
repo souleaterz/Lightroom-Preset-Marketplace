@@ -99,7 +99,7 @@ export default async function DashboardPage() {
             <div className="flex-1">
               <p className="text-sm font-medium text-amber-300">Connect Stripe to receive payouts</p>
               <p className="text-xs text-amber-400/70 mt-1">
-                Set up Stripe Connect to receive 92% of every sale directly to your bank account.
+                Set up Stripe Connect to receive 90% of every sale directly to your bank account.
               </p>
             </div>
             <a href="/api/stripe/connect/onboard">

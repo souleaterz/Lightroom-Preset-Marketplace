@@ -54,7 +54,7 @@ export default async function ManagePresetsPage() {
         ) : (
           <div className="space-y-3">
             {presets.map((preset) => (
-              <div key={preset.id} className="flex items-center gap-4 p-4 bg-surface border border-line rounded-xl hover:border-line-strong transition-colors">
+              <div key={preset.id} className="flex items-center gap-3 sm:gap-4 p-4 bg-surface border border-line rounded-xl hover:border-line-strong transition-colors">
                 <div className="relative w-16 h-12 rounded-lg overflow-hidden flex-shrink-0">
                   <Image
                     src={preset.after_image_url}
@@ -63,7 +63,7 @@ export default async function ManagePresetsPage() {
                     className="object-cover"
                   />
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 overflow-hidden">
                   <div className="flex items-center gap-2 mb-1">
                     <Link href={`/preset/${preset.id}`} className="font-medium text-foreground hover:text-white transition-colors truncate">
                       {preset.title}
@@ -72,11 +72,11 @@ export default async function ManagePresetsPage() {
                       {preset.is_published ? 'Live' : 'Draft'}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-muted">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted">
                     <span className="font-mono">{formatPrice(preset.price_cents)}</span>
                     <span>{preset.downloads} downloads</span>
                     <span>{preset.rating_count > 0 ? `${preset.rating_avg.toFixed(1)}★` : 'No reviews'}</span>
-                    <span>{formatDate(preset.created_at)}</span>
+                    <span className="hidden sm:inline">{formatDate(preset.created_at)}</span>
                   </div>
                 </div>
                 <PresetActions preset={preset} />

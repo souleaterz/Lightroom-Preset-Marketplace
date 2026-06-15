@@ -39,7 +39,7 @@ export default async function SellPage() {
             Turn your style into income
           </h1>
           <p className="text-muted text-lg max-w-xl mx-auto mb-9">
-            List your presets, set your own price, and keep 92% of every sale. Free to join —
+            List your presets, set your own price, and keep 90% of every sale. Free to join —
             and your first month is completely fee-free.
           </p>
 
@@ -59,7 +59,7 @@ export default async function SellPage() {
 
         <div className="grid md:grid-cols-3 gap-6 mt-16">
           {[
-            { icon: DollarSign, title: 'Keep 92%', desc: 'Set your own prices and keep the lion’s share of every sale. No subscription required.' },
+            { icon: DollarSign, title: 'Keep 90%', desc: 'Set your own prices and keep the lion’s share of every sale. No subscription required.' },
             { icon: Tag, title: 'Zero fees to start', desc: 'Your first month is completely fee-free, so your earliest sales are entirely yours.' },
             { icon: Eye, title: 'Sell with confidence', desc: 'Every listing ships with a live before/after slider that sells the look for you.' },
           ].map(({ icon: Icon, title, desc }) => (

@@ -138,7 +138,7 @@ export const POSTS: BlogPost[] = [
     slug: 'how-to-sell-lightroom-presets',
     title: 'How to Sell Lightroom Presets and Make Money in 2026',
     description:
-      'Turn your editing style into income: how to package, price and sell Lightroom presets — and keep 92% of every sale.',
+      'Turn your editing style into income: how to package, price and sell Lightroom presets — and keep 90% of every sale.',
     date: '2026-06-09',
     author: 'PresetScout Team',
     readingMinutes: 7,
@@ -171,7 +171,7 @@ export const POSTS: BlogPost[] = [
       { type: 'h2', text: 'Step 4 — Keep more of what you earn' },
       {
         type: 'p',
-        text: 'On PresetScout you keep **92% of every sale**, get paid directly through Stripe, and pay **zero fees for your first month**. List for free and start selling the same day.',
+        text: 'On PresetScout you keep **90% of every sale**, get paid directly through Stripe, and pay **zero fees for your first month**. List for free and start selling the same day.',
       },
       {
         type: 'quote',

@@ -10,8 +10,16 @@ export const stripe = new Stripe(
   { typescript: true }
 )
 
+// Overall platform fee: 10%. When a creator is referred by an affiliate, half
+// of this (5%) is paid to the affiliate and the platform keeps the other 5%.
 export const PLATFORM_FEE_PERCENT = parseInt(
-  process.env.STRIPE_PLATFORM_FEE_PERCENT ?? '8',
+  process.env.STRIPE_PLATFORM_FEE_PERCENT ?? '10',
+  10
+)
+
+// Share of the overall fee paid out to a referring affiliate (5 of the 10%).
+export const AFFILIATE_FEE_PERCENT = parseInt(
+  process.env.STRIPE_AFFILIATE_FEE_PERCENT ?? '5',
   10
 )
 

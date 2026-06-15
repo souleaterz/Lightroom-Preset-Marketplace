@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { stripe } from '@/lib/stripe'
+import { stripe, PLATFORM_FEE_PERCENT } from '@/lib/stripe'
 import { formatPrice } from '@/lib/utils'
 import type { Profile } from '@/types/database'
 
@@ -161,13 +161,13 @@ export default async function PayoutsPage({
         {/* Earnings summary */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="bg-surface border border-line rounded-xl p-5">
-            <p className="text-sm text-muted mb-2">Total Earned ({feeFreeActive ? '100' : '92'}%)</p>
+            <p className="text-sm text-muted mb-2">Total Earned ({feeFreeActive ? 100 : 100 - PLATFORM_FEE_PERCENT}%)</p>
             <p className="font-mono text-2xl font-bold text-foreground">{formatPrice(totalEarned)}</p>
           </div>
           <div className="bg-surface border border-line rounded-xl p-5">
             <p className="text-sm text-muted mb-2">Platform Fee</p>
             <p className="font-mono text-2xl font-bold text-muted">
-              {feeFreeActive ? '0%' : '8%'}
+              {feeFreeActive ? '0%' : `${PLATFORM_FEE_PERCENT}%`}
             </p>
           </div>
         </div>

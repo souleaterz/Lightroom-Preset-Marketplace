@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { WishlistProvider } from '@/components/WishlistProvider'
 import { ThemeScript } from '@/components/ThemeScript'
+import { Footer } from '@/components/Footer'
 import { siteConfig } from '@/lib/site'
 
 export const metadata: Metadata = {
@@ -62,7 +63,10 @@ export default function RootLayout({
             }),
           }}
         />
-        <WishlistProvider>{children}</WishlistProvider>
+        <WishlistProvider>
+          {children}
+          <Footer />
+        </WishlistProvider>
       </body>
     </html>
   )

@@ -66,9 +66,6 @@ export function Navbar({ user }: NavbarProps) {
             <Link href="/browse" className="text-sm text-muted hover:text-foreground transition-colors">
               Browse
             </Link>
-            <Link href="/blog" className="text-sm text-muted hover:text-foreground transition-colors">
-              Blog
-            </Link>
             {user ? (
               <>
                 <Link href="/wishlist" className="text-sm text-muted hover:text-foreground transition-colors inline-flex items-center gap-1.5">
@@ -184,9 +181,6 @@ export function Navbar({ user }: NavbarProps) {
         <div className="md:hidden border-t border-line bg-canvas px-4 py-4 space-y-3">
           <Link href="/browse" className="block text-sm text-muted hover:text-foreground py-2 transition-colors">
             Browse Presets
-          </Link>
-          <Link href="/blog" className="block text-sm text-muted hover:text-foreground py-2 transition-colors">
-            Blog
           </Link>
           {user ? (
             <>
