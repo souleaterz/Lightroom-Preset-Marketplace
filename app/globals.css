@@ -37,6 +37,59 @@ body {
   background-clip: text;
 }
 
+/* ---- Animated hero background (aurora + drifting grid) ---- */
+@keyframes float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(7%, -5%) scale(1.1); }
+  66% { transform: translate(-6%, 6%) scale(0.94); }
+}
+@keyframes float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-9%, 7%) scale(1.14); }
+}
+@keyframes float-c {
+  0%, 100% { transform: translate(0, 0) scale(1.05); }
+  50% { transform: translate(8%, 4%) scale(0.9); }
+}
+@keyframes grid-pan {
+  from { background-position: 0 0; }
+  to { background-position: 0 -52px; }
+}
+
+.hero-aurora {
+  position: absolute;
+  inset: -25%;
+  pointer-events: none;
+  filter: blur(70px);
+  z-index: 0;
+}
+.hero-aurora .blob {
+  position: absolute;
+  border-radius: 9999px;
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 52px 52px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 25%, #000 35%, transparent 78%);
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 25%, #000 35%, transparent 78%);
+  animation: grid-pan 9s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-aurora .blob,
+  .hero-grid {
+    animation: none !important;
+  }
+}
+
 .btn-primary {
   @apply bg-[#7c5cfc] hover:bg-[#6b4de8] text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 inline-flex items-center gap-2;
 }

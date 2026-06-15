@@ -133,7 +133,7 @@ export function AccountForm({ profile }: { profile: Profile | null }) {
           <Label htmlFor="username" className="mb-1.5">Username</Label>
           <div className="flex items-center gap-0">
             <span className="flex h-11 items-center px-3 rounded-l-lg border border-r-0 border-white/10 bg-white/[0.02] text-[#888891] text-sm">
-              presetmarket.com/seller/
+              presetscout.com/seller/
             </span>
             <Input
               id="username"

@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ShoppingBag, Menu, X, User, Library, LayoutDashboard, LogOut } from 'lucide-react'
+import { Compass, Menu, X, User, Library, LayoutDashboard, LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/button'
@@ -31,10 +31,10 @@ export function Navbar({ user }: NavbarProps) {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7c5cfc] to-[#e05c7a] flex items-center justify-center">
-              <ShoppingBag className="h-4 w-4 text-white" />
+              <Compass className="h-4 w-4 text-white" />
             </div>
             <span className="font-semibold text-[#f0f0f0] text-lg tracking-tight">
-              Preset<span className="text-[#7c5cfc]">Market</span>
+              Preset<span className="text-[#7c5cfc]">Scout</span>
             </span>
           </Link>
 

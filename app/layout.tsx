@@ -3,11 +3,11 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: {
-    default: 'PresetMarket — Lightroom Presets Marketplace',
-    template: '%s | PresetMarket',
+    default: 'PresetScout — Lightroom Presets Marketplace',
+    template: '%s | PresetScout',
   },
   description:
-    'Buy and sell professional Lightroom presets. Transform your photos in one click.',
+    'Discover hand-crafted Lightroom presets from independent creators. Preview, buy once, and transform your photos in one click.',
   keywords: ['lightroom presets', 'photo editing', 'presets marketplace', 'xmp presets'],
 }
 

@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight, Star, Download, Shield, Zap, Camera, ShoppingBag } from 'lucide-react'
+import { ArrowRight, Eye, Download, Shield, Zap, Camera, Compass, Sparkles } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { PresetCard } from '@/components/PresetCard'
 import { Button } from '@/components/ui/button'
@@ -18,14 +18,14 @@ const CATEGORIES = [
   { name: 'Bright', icon: '☀️', color: 'from-yellow-500/20 to-yellow-600/10' },
 ]
 
-async function getFeaturedPresets(): Promise<Preset[]> {
+async function getLatestPresets(): Promise<Preset[]> {
   try {
     const supabase = createClient()
     const { data } = await supabase
       .from('presets')
       .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url)')
       .eq('is_published', true)
-      .order('downloads', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(8)
     return (data as Preset[]) || []
   } catch {
@@ -34,7 +34,7 @@ async function getFeaturedPresets(): Promise<Preset[]> {
 }
 
 export default async function HomePage() {
-  const featuredPresets = await getFeaturedPresets()
+  const latestPresets = await getLatestPresets()
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -43,14 +43,40 @@ export default async function HomePage() {
       <Navbar user={user} />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-28 px-4 overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#7c5cfc]/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute -top-20 -right-40 w-96 h-96 bg-[#e05c7a]/15 rounded-full blur-[120px] pointer-events-none" />
+      <section className="relative pt-24 pb-32 px-4 overflow-hidden">
+        {/* Animated background */}
+        <div className="hero-aurora" aria-hidden="true">
+          <div
+            className="blob"
+            style={{
+              width: 560, height: 560, top: '2%', left: '12%',
+              background: 'radial-gradient(circle, rgba(124,92,252,0.55), transparent 60%)',
+              animation: 'float-a 20s ease-in-out infinite',
+            }}
+          />
+          <div
+            className="blob"
+            style={{
+              width: 500, height: 500, top: '18%', right: '8%',
+              background: 'radial-gradient(circle, rgba(224,92,122,0.45), transparent 60%)',
+              animation: 'float-b 24s ease-in-out infinite',
+            }}
+          />
+          <div
+            className="blob"
+            style={{
+              width: 460, height: 460, bottom: '-12%', left: '38%',
+              background: 'radial-gradient(circle, rgba(70,110,255,0.4), transparent 60%)',
+              animation: 'float-c 28s ease-in-out infinite',
+            }}
+          />
+        </div>
+        <div className="hero-grid" aria-hidden="true" />
 
-        <div className="max-w-5xl mx-auto text-center relative">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#7c5cfc]/10 border border-[#7c5cfc]/20 text-sm text-[#7c5cfc] mb-8">
-            <Star className="h-3.5 w-3.5 fill-[#7c5cfc]" />
-            <span>Trusted by 10,000+ photographers worldwide</span>
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#7c5cfc]/10 border border-[#7c5cfc]/20 text-sm text-[#7c5cfc] mb-8 backdrop-blur-sm">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>A curated marketplace for Lightroom presets</span>
           </div>
 
           <h1 className="font-serif text-6xl sm:text-7xl lg:text-8xl leading-[1.05] mb-6 text-[#f0f0f0]">
@@ -70,47 +96,52 @@ export default async function HomePage() {
           </h1>
 
           <p className="text-lg sm:text-xl text-[#888891] max-w-2xl mx-auto mb-10 leading-relaxed">
-            Browse thousands of professional Lightroom presets created by top photographers.
-            Instant download, one-time payment, yours forever.
+            Discover hand-crafted Lightroom presets from independent creators. Preview every
+            look with a live before/after, buy once, and it&apos;s yours forever.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/browse">
               <Button size="lg" className="text-base px-8 h-14">
-                Browse Presets
+                Explore Presets
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
             <Link href="/auth/signup">
               <Button variant="outline" size="lg" className="text-base px-8 h-14">
-                Sell Your Presets
+                Become a Creator
               </Button>
             </Link>
           </div>
 
-          <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
+          {/* Honest value props (no fabricated numbers) */}
+          <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
             {[
-              { value: '10K+', label: 'Presets' },
-              { value: '5K+', label: 'Sellers' },
-              { value: '50K+', label: 'Downloads' },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-2xl font-bold text-[#f0f0f0] font-mono">{stat.value}</div>
-                <div className="text-sm text-[#888891]">{stat.label}</div>
+              { icon: Eye, title: 'Try before you buy', desc: 'Live before/after on every preset' },
+              { icon: Download, title: 'Instant delivery', desc: 'Download the moment you pay' },
+              { icon: Shield, title: 'Secure checkout', desc: 'One-time payment via Stripe' },
+            ].map(({ icon: Icon, title, desc }) => (
+              <div
+                key={title}
+                className="rounded-xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-sm p-4 text-left"
+              >
+                <Icon className="h-5 w-5 text-[#7c5cfc] mb-2" />
+                <div className="text-sm font-medium text-[#f0f0f0]">{title}</div>
+                <div className="text-xs text-[#888891] mt-0.5">{desc}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured presets */}
-      {featuredPresets.length > 0 && (
+      {/* Latest presets — only when the catalog has something */}
+      {latestPresets.length > 0 && (
         <section className="py-20 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-3xl font-semibold text-[#f0f0f0]">Featured Presets</h2>
-                <p className="text-[#888891] mt-1">Handpicked by our team</p>
+                <h2 className="text-3xl font-semibold text-[#f0f0f0]">Latest Presets</h2>
+                <p className="text-[#888891] mt-1">Fresh from our creators</p>
               </div>
               <Link href="/browse">
                 <Button variant="outline" size="sm">
@@ -119,7 +150,7 @@ export default async function HomePage() {
               </Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {featuredPresets.map((preset) => (
+              {latestPresets.map((preset) => (
                 <PresetCard key={preset.id} preset={preset} />
               ))}
             </div>
@@ -164,7 +195,7 @@ export default async function HomePage() {
                 icon: <Camera className="h-6 w-6 text-[#7c5cfc]" />,
                 step: '01',
                 title: 'Browse & Preview',
-                desc: 'Explore thousands of presets with interactive before/after sliders before you buy.',
+                desc: 'Explore presets with interactive before/after sliders before you spend a penny.',
               },
               {
                 icon: <Zap className="h-6 w-6 text-[#7c5cfc]" />,
@@ -176,7 +207,7 @@ export default async function HomePage() {
                 icon: <Download className="h-6 w-6 text-[#7c5cfc]" />,
                 step: '03',
                 title: 'Download & Apply',
-                desc: 'Download your .xmp or .lrtemplate file and apply it in Lightroom instantly.',
+                desc: 'Grab your .xmp, .lrtemplate, or .zip and apply it in Lightroom instantly.',
               },
             ].map((item) => (
               <div key={item.step} className="relative p-6 bg-[#111114] border border-white/[0.08] rounded-xl">
@@ -198,12 +229,13 @@ export default async function HomePage() {
       <section className="py-20 px-4 border-t border-white/[0.06]">
         <div className="max-w-5xl mx-auto">
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#7c5cfc]/20 to-[#e05c7a]/10 border border-[#7c5cfc]/20 p-10 md:p-14 text-center">
-            <Shield className="h-10 w-10 text-[#7c5cfc] mx-auto mb-6" />
+            <Compass className="h-10 w-10 text-[#7c5cfc] mx-auto mb-6" />
             <h2 className="text-3xl md:text-4xl font-semibold text-[#f0f0f0] mb-4">
               Turn your style into income
             </h2>
             <p className="text-[#888891] text-lg max-w-xl mx-auto mb-8">
-              Join thousands of photographers earning with their presets. You keep 85% of every sale.
+              List your presets, set your own price, and keep 85% of every sale. Free to join —
+              we&apos;re looking for our first creators.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/auth/signup">
@@ -223,17 +255,17 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#7c5cfc] to-[#e05c7a] flex items-center justify-center">
-              <ShoppingBag className="h-3.5 w-3.5 text-white" />
+              <Compass className="h-3.5 w-3.5 text-white" />
             </div>
             <span className="font-semibold text-[#f0f0f0]">
-              Preset<span className="text-[#7c5cfc]">Market</span>
+              Preset<span className="text-[#7c5cfc]">Scout</span>
             </span>
           </div>
           <div className="flex items-center gap-6 text-sm text-[#888891]">
             <Link href="/browse" className="hover:text-[#f0f0f0] transition-colors">Browse</Link>
             <Link href="/auth/signup" className="hover:text-[#f0f0f0] transition-colors">Sell</Link>
           </div>
-          <p className="text-xs text-[#888891]">© 2026 PresetMarket. All rights reserved.</p>
+          <p className="text-xs text-[#888891]">© 2026 PresetScout. All rights reserved.</p>
         </div>
       </footer>
     </div>
