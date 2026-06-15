@@ -27,6 +27,24 @@ export function isBundle(preset: { bundle_preset_ids?: string[] | null }): boole
   return !!preset.bundle_preset_ids && preset.bundle_preset_ids.length > 0
 }
 
+/** Sales threshold at which a seller earns the automatic "Top Seller" badge. */
+export const TOP_SELLER_MIN_SALES = 50
+
+export type SellerBadgeType = 'verified' | 'top'
+
+/**
+ * The trust badge a seller has earned, if any. Manual verification outranks the
+ * automatic top-seller tier. Computed from fields present on the profiles join.
+ */
+export function getSellerBadge(
+  profile?: { is_verified?: boolean | null; total_sales?: number | null } | null
+): SellerBadgeType | null {
+  if (!profile) return null
+  if (profile.is_verified) return 'verified'
+  if ((profile.total_sales ?? 0) >= TOP_SELLER_MIN_SALES) return 'top'
+  return null
+}
+
 export function formatDate(dateString: string): string {
   return new Intl.DateTimeFormat('en-GB', {
     year: 'numeric',

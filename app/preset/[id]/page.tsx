@@ -8,6 +8,7 @@ import { PresetCard } from '@/components/PresetCard'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { StarRating } from '@/components/StarRating'
+import { SellerBadge } from '@/components/SellerBadge'
 import { createClient } from '@/lib/supabase/server'
 import { formatPrice, formatPresetPrice, formatDate, isDemoPreset, isFreePreset, isBundle } from '@/lib/utils'
 import { siteConfig } from '@/lib/site'
@@ -27,7 +28,7 @@ async function getPreset(id: string) {
   // owner's own (draft) presets, so sellers can preview their drafts.
   const { data } = await supabase
     .from('presets')
-    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, bio, total_sales)')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, bio, total_sales, is_verified)')
     .eq('id', id)
     .single()
   return data as Preset | null
@@ -48,7 +49,7 @@ async function getBundleItems(ids: string[]) {
   const supabase = createClient()
   const { data } = await supabase
     .from('presets')
-    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url)')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, is_verified, total_sales)')
     .in('id', ids)
   // Preserve the seller's chosen ordering.
   const rows = (data as Preset[]) || []
@@ -59,7 +60,7 @@ async function getRelated(preset: Preset) {
   const supabase = createClient()
   const { data } = await supabase
     .from('presets')
-    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url)')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, is_verified, total_sales)')
     .eq('is_published', true)
     .eq('category', preset.category || '')
     .neq('id', preset.id)
@@ -296,12 +297,15 @@ export default async function PresetPage({ params }: Props) {
                       )}
                     </Link>
                     <div className="flex-1 min-w-0">
-                      <Link
-                        href={`/seller/${preset.profiles.username}`}
-                        className="font-semibold text-foreground hover:text-[#7c5cfc] transition-colors"
-                      >
-                        {preset.profiles.display_name || preset.profiles.username}
-                      </Link>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <Link
+                          href={`/seller/${preset.profiles.username}`}
+                          className="font-semibold text-foreground hover:text-[#7c5cfc] transition-colors"
+                        >
+                          {preset.profiles.display_name || preset.profiles.username}
+                        </Link>
+                        <SellerBadge profile={preset.profiles} showLabel />
+                      </div>
                       <p className="text-xs text-muted">@{preset.profiles.username}</p>
 
                       {/* Author rating + stats */}
@@ -405,6 +409,7 @@ export default async function PresetPage({ params }: Props) {
                     <span className="text-sm text-muted group-hover:text-foreground transition-colors">
                       {preset.profiles.display_name || preset.profiles.username}
                     </span>
+                    <SellerBadge profile={preset.profiles} />
                   </Link>
                 )}
               </div>

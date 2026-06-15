@@ -29,6 +29,15 @@ ordered roughly by impact-to-effort. Shipped items move to the bottom.
 
 ---
 
+- **Verified / top-seller badges** — `profiles.is_verified` (migration `0008`, manual
+  admin flag) drives a blue Verified badge; "Top Seller" is automatic at
+  `TOP_SELLER_MIN_SALES` (50) sales. `components/SellerBadge.tsx` +
+  `getSellerBadge()`; shown on cards, seller pages, and preset author sections.
+  *Follow-up:* Top Seller is sales-only — could add a 4.5★ requirement once seller
+  rating is denormalized; and `is_verified` has no admin UI yet (set via SQL).
+
+---
+
 ## Next up (high impact)
 
 ### 1. Curated collections / staff picks
@@ -39,29 +48,26 @@ Editorial pages ("Best Moody Film Presets") — strong SEO + authority.
 
 ## Trust & marketplace health
 
-### 2. Verified / top-seller badges
-Badge for sellers with 50+ sales & 4.5★+. Surfaced on cards and seller pages.
-
-### 3. License clarity (personal vs commercial)
+### 2. License clarity (personal vs commercial)
 Per-listing license type; optional higher-priced commercial tier.
 
 ---
 
 ## Bigger swings
 
-### 4. Style quiz / preset finder
+### 3. Style quiz / preset finder
 5-question interactive flow → recommended presets. Shareable, high conversion.
 
-### 5. "Shot with this preset" gallery
+### 4. "Shot with this preset" gallery
 Buyers upload edited photos to the product page. Social proof.
 
-### 6. Subscription access pass
+### 5. Subscription access pass
 £X/month for a rotating library (Envato Elements model). Predictable MRR.
 
-### 7. Try before you buy
+### 6. Try before you buy
 Apply a preset to a user-uploaded photo server-side. Major differentiator.
 
-### 8. LUTs / video presets
+### 7. LUTs / video presets
 Expand into Premiere / DaVinci LUTs — same audience, doubles catalog.
 
 ---

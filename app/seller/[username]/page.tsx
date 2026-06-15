@@ -5,6 +5,7 @@ import { Download, Star, Package } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { PresetCard } from '@/components/PresetCard'
 import { FollowButton } from '@/components/FollowButton'
+import { SellerBadge } from '@/components/SellerBadge'
 import { createClient } from '@/lib/supabase/server'
 import type { Preset, Profile } from '@/types/database'
 
@@ -26,7 +27,7 @@ async function getSellerPresets(sellerId: string) {
   const supabase = createClient()
   const { data } = await supabase
     .from('presets')
-    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url)')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, is_verified, total_sales)')
     .eq('seller_id', sellerId)
     .eq('is_published', true)
     .order('created_at', { ascending: false })
@@ -87,9 +88,12 @@ export default async function SellerPage({ params }: Props) {
             )}
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold text-foreground">
-              {seller.display_name || seller.username}
-            </h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-2xl font-semibold text-foreground">
+                {seller.display_name || seller.username}
+              </h1>
+              <SellerBadge profile={seller} showLabel />
+            </div>
             <p className="text-sm text-muted mt-0.5">@{seller.username}</p>
             {seller.bio && (
               <p className="text-muted mt-3 max-w-xl">{seller.bio}</p>

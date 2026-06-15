@@ -7,6 +7,7 @@ export interface Profile {
   stripe_account_id: string | null
   stripe_account_status: 'pending' | 'active' | 'restricted' | null
   is_seller: boolean
+  is_verified: boolean
   is_affiliate: boolean
   affiliate_code: string | null
   referred_by: string | null

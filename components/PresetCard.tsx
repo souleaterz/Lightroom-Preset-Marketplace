@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Star, Heart } from 'lucide-react'
 import { cn, formatPresetPrice, isDemoPreset, isBundle } from '@/lib/utils'
+import { SellerBadge } from '@/components/SellerBadge'
 import { useWishlist } from '@/components/WishlistProvider'
 import type { Preset } from '@/types/database'
 
@@ -140,9 +141,10 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
         {preset.profiles && (
           <Link
             href={`/seller/${preset.profiles.username}`}
-            className="text-sm text-muted hover:text-foreground transition-colors truncate block mb-2"
+            className="flex items-center gap-1 text-sm text-muted hover:text-foreground transition-colors mb-2"
           >
-            {preset.profiles.display_name || preset.profiles.username}
+            <span className="truncate">{preset.profiles.display_name || preset.profiles.username}</span>
+            <SellerBadge profile={preset.profiles} />
           </Link>
         )}
 
