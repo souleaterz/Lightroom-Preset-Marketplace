@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { ShoppingCart, Loader2, Check, X, Tag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Price } from '@/components/Price'
+import { useCurrency } from '@/components/CurrencyProvider'
 import { formatPrice } from '@/lib/utils'
 import type { Preset } from '@/types/database'
 
@@ -14,6 +16,7 @@ interface PurchaseButtonProps {
 
 export function PurchaseButton({ preset }: PurchaseButtonProps) {
   const router = useRouter()
+  const { isConverted } = useCurrency()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -100,10 +103,15 @@ export function PurchaseButton({ preset }: PurchaseButtonProps) {
         ) : (
           <>
             <ShoppingCart className="h-4 w-4" />
-            Buy now — {formatPrice(effectivePrice)}
+            Buy now — <Price gbpPence={effectivePrice} />
           </>
         )}
       </Button>
+      {isConverted && (
+        <p className="text-xs text-center text-muted">
+          Billed in GBP ({formatPrice(effectivePrice)}) · prices shown in your currency are estimates
+        </p>
+      )}
 
       {/* Discount code */}
       {applied ? (

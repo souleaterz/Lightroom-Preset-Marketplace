@@ -10,7 +10,8 @@ import { Button } from '@/components/ui/button'
 import { StarRating } from '@/components/StarRating'
 import { SellerBadge } from '@/components/SellerBadge'
 import { createClient } from '@/lib/supabase/server'
-import { formatPrice, formatPresetPrice, formatDate, isDemoPreset, isFreePreset, isBundle } from '@/lib/utils'
+import { formatDate, isDemoPreset, isFreePreset, isBundle } from '@/lib/utils'
+import { Price } from '@/components/Price'
 import { siteConfig } from '@/lib/site'
 import type { Preset, Review, Purchase } from '@/types/database'
 import { PurchaseButton } from './PurchaseButton'
@@ -221,7 +222,8 @@ export default async function PresetPage({ params }: Props) {
                 </h2>
                 {bundleSavings > 0 && (
                   <p className="text-sm text-green-400 mb-4">
-                    Buy together and save {formatPrice(bundleSavings)} vs {formatPrice(individualTotal)} individually.
+                    Buy together and save <Price gbpPence={bundleSavings} className="inline" /> vs{' '}
+                    <Price gbpPence={individualTotal} className="inline" /> individually.
                   </p>
                 )}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -427,19 +429,15 @@ export default async function PresetPage({ params }: Props) {
               {/* Price */}
               <div className="space-y-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="font-mono text-3xl font-bold text-foreground">
-                    {formatPresetPrice(preset.price_cents)}
-                  </span>
+                  <Price gbpPence={preset.price_cents} className="font-mono text-3xl font-bold text-foreground" />
                   {bundle && bundleSavings > 0 ? (
-                    <span className="text-sm text-muted line-through font-mono">
-                      {formatPrice(individualTotal)}
-                    </span>
+                    <Price gbpPence={individualTotal} className="text-sm text-muted line-through font-mono" />
                   ) : !free ? (
                     <span className="text-sm text-muted">one-time</span>
                   ) : null}
                 </div>
                 {bundle && bundleSavings > 0 && (
-                  <p className="text-sm text-green-400">Save {formatPrice(bundleSavings)} with this bundle</p>
+                  <p className="text-sm text-green-400">Save <Price gbpPence={bundleSavings} className="inline" /> with this bundle</p>
                 )}
               </div>
 

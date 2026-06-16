@@ -29,6 +29,12 @@ ordered roughly by impact-to-effort. Shipped items move to the bottom.
 
 ---
 
+- **Multi-currency display** — prices shown in the visitor's currency (auto by Vercel
+  geo + manual nav switcher, remembered in a `currency` cookie). Display-only: charge
+  stays GBP with a "billed in GBP" note. `lib/currency.ts` (rates via open.er-api.com,
+  6h cache + static fallback), `CurrencyProvider` / `Price` / `CurrencySwitcher`.
+  Dashboards/payouts/earnings stay GBP (real settled money). *Future:* true local
+  charging = enable Stripe Adaptive Pricing (dashboard toggle) + small checkout tweak.
 - **Verified / top-seller badges** — `profiles.is_verified` (migration `0008`, manual
   admin flag) drives a blue Verified badge; "Top Seller" is automatic at
   `TOP_SELLER_MIN_SALES` (50) sales. `components/SellerBadge.tsx` +

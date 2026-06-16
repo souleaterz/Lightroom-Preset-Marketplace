@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BeforeAfterSlider } from '@/components/BeforeAfterSlider'
 import { Button } from '@/components/ui/button'
-import { formatPresetPrice } from '@/lib/utils'
+import { Price } from '@/components/Price'
 import type { Preset } from '@/types/database'
 
 interface QuickPreviewModalProps {
@@ -33,9 +33,7 @@ export function QuickPreviewModal({ preset, onClose }: QuickPreviewModalProps) {
           className="mb-4"
         />
         <div className="flex items-center justify-between">
-          <span className="font-mono text-2xl font-semibold text-foreground">
-            {formatPresetPrice(preset.price_cents)}
-          </span>
+          <Price gbpPence={preset.price_cents} className="font-mono text-2xl font-semibold text-foreground" />
           <div className="flex gap-3">
             <Button variant="outline" size="sm" onClick={onClose}>
               Close

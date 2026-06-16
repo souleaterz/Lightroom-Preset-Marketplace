@@ -9,6 +9,7 @@ import { isSellerProfile } from '@/lib/utils'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { CurrencySwitcher } from '@/components/CurrencySwitcher'
 
 interface NavbarProps {
   user?: SupabaseUser | null
@@ -97,6 +98,7 @@ export function Navbar({ user }: NavbarProps) {
                     Become a Seller
                   </Link>
                 )}
+                <CurrencySwitcher />
                 <ThemeToggle />
                 <div className="relative">
                   <button
@@ -174,6 +176,7 @@ export function Navbar({ user }: NavbarProps) {
               </>
             ) : (
               <div className="flex items-center gap-3">
+                <CurrencySwitcher />
                 <ThemeToggle />
                 <Link href="/auth/signin">
                   <Button variant="ghost" size="sm">Sign in</Button>
@@ -187,6 +190,7 @@ export function Navbar({ user }: NavbarProps) {
 
           {/* Mobile controls */}
           <div className="md:hidden flex items-center gap-1">
+            <CurrencySwitcher />
             <ThemeToggle />
             <button
               className="p-2 text-muted hover:text-foreground transition-colors"

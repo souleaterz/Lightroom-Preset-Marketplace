@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
+import { cookies, headers } from 'next/headers'
 import './globals.css'
 import { WishlistProvider } from '@/components/WishlistProvider'
+import { CurrencyProvider } from '@/components/CurrencyProvider'
 import { ThemeScript } from '@/components/ThemeScript'
 import { Footer } from '@/components/Footer'
 import { siteConfig } from '@/lib/site'
+import { getRates, currencyForCountry, isCurrencyCode } from '@/lib/currency'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -35,11 +38,20 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // Pick the display currency: the visitor's saved choice, else inferred from
+  // their country (Vercel geo header), else GBP. Rates are cached for 6h.
+  const cookieCurrency = cookies().get('currency')?.value
+  const country = headers().get('x-vercel-ip-country')
+  const initialCurrency = isCurrencyCode(cookieCurrency)
+    ? cookieCurrency
+    : currencyForCountry(country)
+  const rates = await getRates()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -63,10 +75,12 @@ export default function RootLayout({
             }),
           }}
         />
-        <WishlistProvider>
-          {children}
-          <Footer />
-        </WishlistProvider>
+        <CurrencyProvider initialCurrency={initialCurrency} rates={rates}>
+          <WishlistProvider>
+            {children}
+            <Footer />
+          </WishlistProvider>
+        </CurrencyProvider>
       </body>
     </html>
   )
