@@ -103,9 +103,25 @@ async function getUserPurchase(presetId: string) {
 export async function generateMetadata({ params }: Props) {
   const preset = await getPreset(params.id)
   if (!preset) return { title: 'Preset not found' }
+  const description = preset.description || `Buy ${preset.title} — a Lightroom preset on ${siteConfig.name}.`
+  const image = preset.after_image_url
   return {
     title: preset.title,
-    description: preset.description || `Buy ${preset.title} Lightroom preset`,
+    description,
+    alternates: { canonical: `/preset/${preset.id}` },
+    openGraph: {
+      type: 'website',
+      title: preset.title,
+      description,
+      url: `${siteConfig.url}/preset/${preset.id}`,
+      images: image ? [{ url: image, alt: preset.title }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: preset.title,
+      description,
+      images: image ? [image] : undefined,
+    },
   }
 }
 

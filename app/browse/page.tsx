@@ -6,7 +6,12 @@ import { FilterSidebar } from '@/components/FilterSidebar'
 import { BrowseGrid } from './BrowseGrid'
 import { createClient } from '@/lib/supabase/server'
 
-export const metadata = { title: 'Browse Presets' }
+export const metadata = {
+  title: 'Browse Lightroom Presets',
+  description:
+    'Browse and buy Lightroom presets with live before/after previews. Filter by style — portrait, film, moody, bright and more — including free presets.',
+  alternates: { canonical: '/browse' },
+}
 
 export default async function BrowsePage({
   searchParams,

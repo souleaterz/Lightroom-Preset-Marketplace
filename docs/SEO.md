@@ -7,22 +7,18 @@ How to get found and rank for "lightroom presets", "free lightroom presets",
 
 ## 0. Do these first (highest impact / lowest effort)
 
-1. 🔧 **Fix canonical URLs.** Root layout sets `alternates: { canonical: '/' }`,
-   which Next inherits into child pages — so preset/browse/seller pages may all be
-   canonicalising to the homepage (tells Google they're duplicates). Fix: remove the
-   global canonical and set a per-page canonical in each `generateMetadata`
-   (homepage `/`, preset `/preset/[id]`, seller `/seller/[username]`, etc.).
-2. ⬜ **Open Graph / social share images.** No OG image today → links shared on
-   X/FB/WhatsApp/Discord show no preview = far fewer clicks. Add a default
-   `app/opengraph-image.tsx` and a **dynamic per-preset OG image** (the after photo)
-   via `ImageResponse`.
-3. ⬜ **Blog post metadata.** `app/blog/[slug]/page.tsx` has no `generateMetadata`,
-   so posts lack unique titles/descriptions/canonicals/OG. Add it.
+1. ✅ **Canonical URLs fixed.** Removed the inherited global `canonical: '/'` from the
+   root layout; each indexable page now sets its own (home, browse, preset, seller,
+   sell, affiliates, blog, blog posts).
+2. ✅ **Open Graph / social share images.** Default branded card at
+   `app/opengraph-image.tsx`; preset pages use their after photo as the OG/Twitter
+   image; seller pages use the avatar; blog posts use their cover.
+3. ✅ **Blog post metadata.** `app/blog/[slug]` already has full `generateMetadata`
+   (title, description, canonical, article OG + Twitter).
 4. ⬜ **Google Search Console + Bing Webmaster.** Verify the domain, submit
    `https://presetscout.com/sitemap.xml`, watch Coverage + Performance. (Bing also
-   feeds ChatGPT search.)
-5. ⬜ **Per-preset `og:image`.** In the preset `generateMetadata`, set
-   `openGraph.images` / `twitter.images` to the preset's after image.
+   feeds ChatGPT search.) **← the main remaining quick win, and only you can do it.**
+5. ✅ **Per-preset `og:image`** — done as part of #2.
 
 ---
 
@@ -37,10 +33,12 @@ How to get found and rank for "lightroom presets", "free lightroom presets",
 - ✅ `WebSite` JSON-LD with `SearchAction` (sitelinks search box eligibility).
 - ✅ `Product` + `Offer` + `AggregateRating` + `Review` JSON-LD on preset pages
   (price/stars rich results).
+- ✅ `BlogPosting` JSON-LD on blog posts.
+- ✅ `Organization` JSON-LD (brand entity). TODO: add `sameAs` social profile URLs
+  once they exist.
 - ✅ Favicon (`app/icon.svg`).
-- 🔧 Canonicals (see §0.1).
-- ⬜ `Organization` JSON-LD (brand entity / knowledge panel) — name, logo, sameAs
-  (social profiles).
+- ✅ Per-page canonicals (see §0.1).
+- ✅ Default + per-page Open Graph images (see §0.2).
 - ⬜ `BreadcrumbList` JSON-LD on preset/seller/category pages (breadcrumb rich result).
 - ⬜ Web manifest + apple-touch-icon (minor; PWA/share polish).
 - ⬜ Add seller pages (and future collection/category pages) to the sitemap.

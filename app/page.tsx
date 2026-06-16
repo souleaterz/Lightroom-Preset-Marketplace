@@ -8,6 +8,8 @@ import { HeroShowcase } from '@/components/HeroShowcase'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/server'
 
+export const metadata = { alternates: { canonical: '/' } }
+
 const HERO_PHOTO = 'https://picsum.photos/seed/presetscout-hero-9/1000/1250'
 
 export default async function HomePage() {

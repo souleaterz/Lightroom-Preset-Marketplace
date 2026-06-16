@@ -63,15 +63,13 @@ Per-listing license type; optional higher-priced commercial tier.
 
 Full checklist + status in [`docs/SEO.md`](./SEO.md). Highest-leverage items:
 
-### Quick wins (do first)
-- 🔧 **Fix canonical URLs** — root layout's global `canonical: '/'` is inherited by
-  child pages; set per-page canonicals so pages aren't all canonicalising to home.
-- ⬜ **Open Graph images** — default `opengraph-image` + dynamic per-preset OG image
-  (after photo via `ImageResponse`); add `og:image` to preset metadata. Drives social CTR.
-- ⬜ **Blog post metadata** — `app/blog/[slug]` lacks `generateMetadata` (no unique
-  title/description/canonical/OG per post).
-- ⬜ **Search Console + Bing** — verify domain, submit sitemap, monitor coverage.
-- ⬜ **Organization + BreadcrumbList JSON-LD**.
+### Quick wins
+- ✅ **Canonical URLs fixed** — removed inherited global canonical; per-page canonicals added.
+- ✅ **Open Graph images** — default branded card + preset (after photo) + seller (avatar) + blog (cover).
+- ✅ **Blog post metadata** — already present (title/description/canonical/OG).
+- ✅ **Organization JSON-LD** — added (add `sameAs` socials later).
+- ⬜ **Search Console + Bing** — verify domain, submit sitemap, monitor coverage. (Owner action.)
+- ⬜ **BreadcrumbList JSON-LD** on preset/seller/category pages.
 
 ### Content & structure (ranking driver)
 - ⬜ **Category landing pages** with real URLs (`/presets/portrait`, …) + unique copy,

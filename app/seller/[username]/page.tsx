@@ -7,6 +7,7 @@ import { PresetCard } from '@/components/PresetCard'
 import { FollowButton } from '@/components/FollowButton'
 import { SellerBadge } from '@/components/SellerBadge'
 import { createClient } from '@/lib/supabase/server'
+import { siteConfig } from '@/lib/site'
 import type { Preset, Profile } from '@/types/database'
 
 interface Props {
@@ -37,7 +38,20 @@ async function getSellerPresets(sellerId: string) {
 export async function generateMetadata({ params }: Props) {
   const seller = await getSeller(params.username)
   if (!seller) return { title: 'Seller not found' }
-  return { title: `${seller.display_name || seller.username} — Presets` }
+  const name = seller.display_name || seller.username
+  const description = seller.bio || `Lightroom presets by ${name} on ${siteConfig.name}.`
+  return {
+    title: `${name} — Lightroom Presets`,
+    description,
+    alternates: { canonical: `/seller/${seller.username}` },
+    openGraph: {
+      type: 'profile',
+      title: `${name} — Lightroom Presets`,
+      description,
+      url: `${siteConfig.url}/seller/${seller.username}`,
+      images: seller.avatar_url ? [{ url: seller.avatar_url, alt: name }] : undefined,
+    },
+  }
 }
 
 export default async function SellerPage({ params }: Props) {

@@ -17,7 +17,8 @@ export const metadata: Metadata = {
   description: siteConfig.description,
   keywords: siteConfig.keywords,
   applicationName: siteConfig.name,
-  alternates: { canonical: '/' },
+  // No global canonical here — it would be inherited by every child route and
+  // make them all canonicalise to "/". Each page sets its own canonical.
   openGraph: {
     type: 'website',
     siteName: siteConfig.name,
@@ -72,6 +73,19 @@ export default async function RootLayout({
                 target: `${siteConfig.url}/browse?category={search_term_string}`,
                 'query-input': 'required name=search_term_string',
               },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: siteConfig.name,
+              url: siteConfig.url,
+              logo: `${siteConfig.url}/icon.svg`,
+              description: siteConfig.description,
             }),
           }}
         />
