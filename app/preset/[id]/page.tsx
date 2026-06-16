@@ -12,6 +12,7 @@ import { SellerBadge } from '@/components/SellerBadge'
 import { createClient } from '@/lib/supabase/server'
 import { formatDate, isDemoPreset, isFreePreset, isBundle } from '@/lib/utils'
 import { categoryLabel } from '@/lib/categories'
+import { reconcileCheckoutForUser } from '@/lib/purchases'
 import { Price } from '@/components/Price'
 import { siteConfig } from '@/lib/site'
 import type { Preset, Review, Purchase } from '@/types/database'
@@ -22,6 +23,7 @@ import { DemoGalleryClient } from './DemoGalleryClient'
 
 interface Props {
   params: { id: string }
+  searchParams?: { session_id?: string; purchased?: string }
 }
 
 async function getPreset(id: string) {
@@ -126,7 +128,15 @@ export async function generateMetadata({ params }: Props) {
   }
 }
 
-export default async function PresetPage({ params }: Props) {
+export default async function PresetPage({ params, searchParams }: Props) {
+  // Safety net: if the buyer just returned from Stripe, finalize the purchase
+  // directly in case the webhook is delayed or failed — so the download unlocks.
+  if (searchParams?.session_id) {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) await reconcileCheckoutForUser(searchParams.session_id, user.id)
+  }
+
   const [preset, reviews, userPurchase] = await Promise.all([
     getPreset(params.id),
     getReviews(params.id),

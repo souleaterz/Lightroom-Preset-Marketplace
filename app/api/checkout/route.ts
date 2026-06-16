@@ -92,7 +92,7 @@ export async function POST(request: Request) {
         platform_fee_cents: String(feeAmount),
         ...(discountCodeId ? { discount_code_id: discountCodeId } : {}),
       },
-      success_url: `${siteUrl}/preset/${preset.id}?purchased=true`,
+      success_url: `${siteUrl}/preset/${preset.id}?purchased=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/preset/${preset.id}`,
     }
 

@@ -108,6 +108,13 @@ Expand into Premiere / DaVinci LUTs — same audience, doubles catalog.
 
 ---
 
+## Reliability
+- ✅ **Purchase reconciliation fallback** — purchase recording + side effects are
+  centralised in `lib/purchases.ts` (`finalizeCheckoutSession`, idempotent). The
+  webhook calls it, and the preset page also reconciles via `?session_id=` on return
+  from Stripe, so downloads unlock even if the webhook is delayed/misconfigured.
+  Idempotency also fixes potential double-counting on webhook retries.
+
 ## Known follow-ups / debt
 - **Bundle editor** — bundles can be created, published/unpublished and deleted, but
   their contents can't be edited after creation (Edit is hidden for bundles in
