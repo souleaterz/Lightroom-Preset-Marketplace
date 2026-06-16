@@ -59,6 +59,32 @@ Per-listing license type; optional higher-priced commercial tier.
 
 ---
 
+## SEO & discoverability
+
+Full checklist + status in [`docs/SEO.md`](./SEO.md). Highest-leverage items:
+
+### Quick wins (do first)
+- 🔧 **Fix canonical URLs** — root layout's global `canonical: '/'` is inherited by
+  child pages; set per-page canonicals so pages aren't all canonicalising to home.
+- ⬜ **Open Graph images** — default `opengraph-image` + dynamic per-preset OG image
+  (after photo via `ImageResponse`); add `og:image` to preset metadata. Drives social CTR.
+- ⬜ **Blog post metadata** — `app/blog/[slug]` lacks `generateMetadata` (no unique
+  title/description/canonical/OG per post).
+- ⬜ **Search Console + Bing** — verify domain, submit sitemap, monitor coverage.
+- ⬜ **Organization + BreadcrumbList JSON-LD**.
+
+### Content & structure (ranking driver)
+- ⬜ **Category landing pages** with real URLs (`/presets/portrait`, …) + unique copy,
+  instead of `?category=` query params.
+- ⬜ **Free-presets content hub** (`/free-lightroom-presets`) — high search volume.
+- ⬜ **Keyword-rich preset slugs** (`/preset/[id]/[slug]`) with 301s from old URLs.
+- ⬜ **Blog content calendar** ("best presets for X", install guides incl. DNG/mobile)
+  internally linking to presets/categories.
+
+### Performance
+- 🔧 Audit `next/image` `unoptimized` usage + Core Web Vitals (LCP/CLS); confirm the
+  dynamic (cookie/geo) render isn't hurting TTFB.
+
 ## Bigger swings
 
 ### 3. Style quiz / preset finder
