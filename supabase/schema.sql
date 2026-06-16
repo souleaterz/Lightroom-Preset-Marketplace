@@ -94,6 +94,29 @@ create table if not exists follows (
 );
 create index if not exists idx_follows_seller on follows(seller_id);
 
+-- Affiliate commission ledger + payouts
+create table if not exists affiliate_commissions (
+  id uuid primary key default gen_random_uuid(),
+  affiliate_id uuid references profiles(id) on delete cascade,
+  purchase_id uuid references purchases(id) on delete cascade unique,
+  creator_id uuid references profiles(id) on delete set null,
+  amount_cents integer not null,
+  status text not null default 'pending' check (status in ('pending', 'paid', 'reversed')),
+  payout_id uuid,
+  created_at timestamptz default now()
+);
+create index if not exists idx_aff_comm_affiliate on affiliate_commissions(affiliate_id, status);
+
+create table if not exists affiliate_payouts (
+  id uuid primary key default gen_random_uuid(),
+  affiliate_id uuid references profiles(id) on delete cascade,
+  amount_cents integer not null,
+  stripe_transfer_id text,
+  status text not null default 'pending' check (status in ('pending', 'paid', 'failed')),
+  created_at timestamptz default now()
+);
+create index if not exists idx_aff_payout_affiliate on affiliate_payouts(affiliate_id);
+
 -- Wishlists
 create table if not exists wishlists (
   user_id uuid references profiles(id),
@@ -110,6 +133,8 @@ alter table reviews enable row level security;
 alter table wishlists enable row level security;
 alter table discount_codes enable row level security;
 alter table follows enable row level security;
+alter table affiliate_commissions enable row level security;
+alter table affiliate_payouts enable row level security;
 
 -- Profiles
 create policy "Public profiles are viewable by everyone" on profiles for select using (true);
@@ -144,6 +169,12 @@ create policy "Sellers manage own discount codes" on discount_codes
 create policy "Follows are viewable by everyone" on follows for select using (true);
 create policy "Users can follow" on follows for insert with check (follower_id = auth.uid());
 create policy "Users can unfollow" on follows for delete using (follower_id = auth.uid());
+
+-- Affiliate ledger (affiliates read their own; writes via service role)
+create policy "Affiliates read own commissions" on affiliate_commissions
+  for select using (affiliate_id = auth.uid());
+create policy "Affiliates read own payouts" on affiliate_payouts
+  for select using (affiliate_id = auth.uid());
 
 -- Helper functions
 create or replace function redeem_discount_code(code_id uuid)

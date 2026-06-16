@@ -84,6 +84,26 @@ export interface Follow {
   created_at: string
 }
 
+export interface AffiliateCommission {
+  id: string
+  affiliate_id: string
+  purchase_id: string
+  creator_id: string | null
+  amount_cents: number
+  status: 'pending' | 'paid' | 'reversed'
+  payout_id: string | null
+  created_at: string
+}
+
+export interface AffiliatePayout {
+  id: string
+  affiliate_id: string
+  amount_cents: number
+  stripe_transfer_id: string | null
+  status: 'pending' | 'paid' | 'failed'
+  created_at: string
+}
+
 export interface Wishlist {
   user_id: string
   preset_id: string

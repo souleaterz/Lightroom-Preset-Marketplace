@@ -5,7 +5,58 @@ import { siteConfig } from '@/lib/site'
 type Admin = ReturnType<typeof createAdminClient>
 
 // Affiliate's share of each platform fee (5 of 10% = half the fee).
-const AFFILIATE_SHARE = PLATFORM_FEE_PERCENT > 0 ? AFFILIATE_FEE_PERCENT / PLATFORM_FEE_PERCENT : 0.5
+export const AFFILIATE_SHARE = PLATFORM_FEE_PERCENT > 0 ? AFFILIATE_FEE_PERCENT / PLATFORM_FEE_PERCENT : 0.5
+
+// Payout rules.
+export const PAYOUT_HOLD_DAYS = 30
+export const MIN_PAYOUT_CENTS = 2500 // £25
+
+/** Affiliate's commission for a single sale, given the platform fee taken. */
+export function commissionForFee(feeCents: number): number {
+  return Math.max(0, Math.round(feeCents * AFFILIATE_SHARE))
+}
+
+export interface AffiliateBalance {
+  /** Matured pending commissions, withdrawable now. */
+  availableCents: number
+  /** Pending commissions still inside the hold window. */
+  clearingCents: number
+  /** Already paid out. */
+  paidCents: number
+  /** availableCents + clearingCents + paidCents. */
+  lifetimeCents: number
+  canWithdraw: boolean
+}
+
+/** Ledger-based balance for an affiliate (source of truth for payouts). */
+export async function getAffiliateBalance(affiliateId: string): Promise<AffiliateBalance> {
+  const admin = createAdminClient()
+  const cutoff = new Date(Date.now() - PAYOUT_HOLD_DAYS * 24 * 60 * 60 * 1000).toISOString()
+
+  const { data: commissions } = await admin
+    .from('affiliate_commissions')
+    .select('amount_cents, status, created_at')
+    .eq('affiliate_id', affiliateId)
+
+  let availableCents = 0
+  let clearingCents = 0
+  let paidCents = 0
+  for (const c of (commissions || []) as { amount_cents: number; status: string; created_at: string }[]) {
+    if (c.status === 'paid') paidCents += c.amount_cents
+    else if (c.status === 'pending') {
+      if (c.created_at <= cutoff) availableCents += c.amount_cents
+      else clearingCents += c.amount_cents
+    }
+  }
+
+  return {
+    availableCents,
+    clearingCents,
+    paidCents,
+    lifetimeCents: availableCents + clearingCents + paidCents,
+    canWithdraw: availableCents >= MIN_PAYOUT_CENTS,
+  }
+}
 
 function randomCode(): string {
   return Math.random().toString(36).slice(2, 8).toUpperCase()

@@ -3,15 +3,17 @@ export const dynamic = 'force-dynamic'
 import React from 'react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Users, TrendingUp, Wallet, Package, ArrowUpRight, Share2, BookOpen } from 'lucide-react'
+import { Users, TrendingUp, Wallet, Package, ArrowUpRight, Share2, BookOpen, Clock, CheckCircle } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { CopyField } from '@/components/CopyField'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { ensureAffiliate, getAffiliateData } from '@/lib/affiliate'
+import { ensureAffiliate, getAffiliateData, getAffiliateBalance, MIN_PAYOUT_CENTS, PAYOUT_HOLD_DAYS } from '@/lib/affiliate'
 import { formatPrice, formatDate } from '@/lib/utils'
 import { AFFILIATE_FEE_PERCENT, PLATFORM_FEE_PERCENT } from '@/lib/stripe'
 import { siteConfig } from '@/lib/site'
+import type { AffiliatePayout } from '@/types/database'
+import { CashOutButton } from './CashOutButton'
 
 export const metadata = { title: 'Affiliate Dashboard' }
 
@@ -24,12 +26,25 @@ export default async function AffiliateDashboardPage() {
   const admin = createAdminClient()
   const { data: profile } = await admin
     .from('profiles')
-    .select('is_affiliate, affiliate_code, display_name, username')
+    .select('is_affiliate, affiliate_code, display_name, username, stripe_account_id, stripe_account_status')
     .eq('id', user.id)
     .single()
 
   const code = await ensureAffiliate(user.id, profile)
   const data = await getAffiliateData(user.id, code)
+  const balance = await getAffiliateBalance(user.id)
+
+  const { data: payoutRows } = await admin
+    .from('affiliate_payouts')
+    .select('*')
+    .eq('affiliate_id', user.id)
+    .in('status', ['paid', 'pending'])
+    .order('created_at', { ascending: false })
+    .limit(20)
+  const payouts = (payoutRows as AffiliatePayout[]) || []
+
+  const isConnected =
+    !!(profile as { stripe_account_id?: string | null } | null)?.stripe_account_id
 
   const shareText =
     `I sell Lightroom presets on PresetScout — you can too, and keep ${100 - PLATFORM_FEE_PERCENT}% of every sale. ` +
@@ -37,9 +52,9 @@ export default async function AffiliateDashboardPage() {
 
   const stats = [
     { label: 'Creators referred', value: String(data.totalCreators), icon: Users, color: 'text-[#7c5cfc]' },
-    { label: 'Active creators', value: String(data.activeCreators), icon: Package, color: 'text-blue-400' },
     { label: 'Sales generated', value: String(data.salesCount), icon: TrendingUp, color: 'text-[#e05c7a]' },
-    { label: 'Your earnings', value: formatPrice(data.earningsCents), icon: Wallet, color: 'text-green-400' },
+    { label: 'Available to cash out', value: formatPrice(balance.availableCents), icon: Wallet, color: 'text-green-400' },
+    { label: 'Lifetime earned', value: formatPrice(balance.lifetimeCents), icon: Package, color: 'text-blue-400' },
   ]
 
   return (
@@ -64,6 +79,61 @@ export default async function AffiliateDashboardPage() {
               <div className="font-mono text-2xl font-bold text-foreground">{value}</div>
             </div>
           ))}
+        </div>
+
+        {/* Payouts */}
+        <div className="bg-surface border border-line rounded-xl p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Wallet className="h-4 w-4 text-[#7c5cfc]" />
+            <h2 className="text-base font-semibold text-foreground">Payouts</h2>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-4 mb-5">
+            <div className="rounded-xl border border-line p-4">
+              <div className="flex items-center gap-1.5 text-xs text-muted mb-1">
+                <CheckCircle className="h-3.5 w-3.5 text-green-400" /> Available now
+              </div>
+              <p className="font-mono text-lg font-bold text-foreground">{formatPrice(balance.availableCents)}</p>
+            </div>
+            <div className="rounded-xl border border-line p-4">
+              <div className="flex items-center gap-1.5 text-xs text-muted mb-1">
+                <Clock className="h-3.5 w-3.5 text-amber-400" /> Clearing ({PAYOUT_HOLD_DAYS}-day hold)
+              </div>
+              <p className="font-mono text-lg font-bold text-foreground">{formatPrice(balance.clearingCents)}</p>
+            </div>
+            <div className="rounded-xl border border-line p-4">
+              <div className="flex items-center gap-1.5 text-xs text-muted mb-1">
+                <Wallet className="h-3.5 w-3.5 text-muted" /> Paid out
+              </div>
+              <p className="font-mono text-lg font-bold text-foreground">{formatPrice(balance.paidCents)}</p>
+            </div>
+          </div>
+
+          <CashOutButton
+            isConnected={isConnected}
+            availableCents={balance.availableCents}
+            canWithdraw={balance.canWithdraw}
+            minCents={MIN_PAYOUT_CENTS}
+          />
+
+          {payouts.length > 0 && (
+            <div className="mt-6 border-t border-line pt-4">
+              <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">Payout history</h3>
+              <div className="space-y-2">
+                {payouts.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between text-sm">
+                    <span className="text-muted">{formatDate(p.created_at)}</span>
+                    <span className="flex items-center gap-2">
+                      <span className="font-mono text-foreground">{formatPrice(p.amount_cents)}</span>
+                      <span className={p.status === 'paid' ? 'text-green-400 text-xs' : 'text-amber-400 text-xs'}>
+                        {p.status}
+                      </span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6 mb-8">

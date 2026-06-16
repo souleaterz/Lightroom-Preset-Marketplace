@@ -82,5 +82,11 @@ Expand into Premiere / DaVinci LUTs — same audience, doubles catalog.
 - **Bundle editor** — bundles can be created, published/unpublished and deleted, but
   their contents can't be edited after creation (Edit is hidden for bundles in
   `PresetActions`). Build an editor reusing `BundleCreator` for in-place changes.
-- Affiliate **payouts** are tracked but not yet paid out (Stripe Connect transfers).
 - Pending DB migrations must be applied to live Supabase (see repo migrations).
+
+## ✅ Shipped (continued)
+- **Affiliate payouts** — commission ledger (`affiliate_commissions`) + `affiliate_payouts`
+  (migration `0009`). Webhook records a commission (half the fee) per referred sale and
+  reverses it on dispute. Self-service cash-out via `/api/affiliate/payout` (Stripe
+  transfer to the affiliate's connected account), 30-day clearing hold, £25 minimum.
+  Balance/hold/history UI on `/affiliate`. Helpers in `lib/affiliate.ts`.

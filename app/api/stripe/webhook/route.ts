@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import type { Stripe } from 'stripe'
 import { stripe, PLATFORM_FEE_PERCENT } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { commissionForFee } from '@/lib/affiliate'
 import { sendPurchaseReceipt, sendSaleNotification } from '@/lib/email'
 import { formatPrice } from '@/lib/utils'
 
@@ -40,18 +41,39 @@ export async function POST(request: Request) {
           : Math.round(amountCents * (PLATFORM_FEE_PERCENT / 100))
       const payoutCents = amountCents - feeCents
 
-      await supabase.from('purchases').upsert({
+      const { data: purchaseRow } = await supabase.from('purchases').upsert({
         buyer_id,
         preset_id,
         stripe_payment_intent_id: session.payment_intent || session.id,
         amount_cents: amountCents,
         seller_payout_cents: payoutCents,
         status: 'succeeded',
-      }, { onConflict: 'stripe_payment_intent_id', ignoreDuplicates: false })
+      }, { onConflict: 'stripe_payment_intent_id', ignoreDuplicates: false }).select('id').single()
 
       // Record discount-code usage (atomic, capped) if one was applied.
       if (session.metadata?.discount_code_id) {
         await supabase.rpc('redeem_discount_code', { code_id: session.metadata.discount_code_id })
+      }
+
+      // Record an affiliate commission if this creator was referred (one per
+      // purchase). Half the platform fee; skipped when the sale was fee-free.
+      if (seller_id && feeCents > 0 && purchaseRow?.id) {
+        const { data: sellerProfile } = await supabase
+          .from('profiles')
+          .select('referred_by')
+          .eq('id', seller_id)
+          .single()
+        const affiliateId = (sellerProfile as { referred_by?: string | null } | null)?.referred_by
+        const commissionCents = commissionForFee(feeCents)
+        if (affiliateId && commissionCents > 0) {
+          await supabase.from('affiliate_commissions').upsert({
+            affiliate_id: affiliateId,
+            purchase_id: purchaseRow.id,
+            creator_id: seller_id,
+            amount_cents: commissionCents,
+            status: 'pending',
+          }, { onConflict: 'purchase_id', ignoreDuplicates: true })
+        }
       }
 
       // Increment download count on preset
@@ -119,10 +141,21 @@ export async function POST(request: Request) {
 
   if (event.type === 'charge.dispute.created') {
     const dispute = event.data.object as Stripe.Dispute
-    await supabase
+    const { data: refunded } = await supabase
       .from('purchases')
       .update({ status: 'refunded' })
       .eq('stripe_payment_intent_id', dispute.payment_intent)
+      .select('id')
+      .single()
+
+    // Claw back any not-yet-paid affiliate commission for this sale.
+    if (refunded?.id) {
+      await supabase
+        .from('affiliate_commissions')
+        .update({ status: 'reversed' })
+        .eq('purchase_id', refunded.id)
+        .eq('status', 'pending')
+    }
   }
 
   return NextResponse.json({ received: true })
