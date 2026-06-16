@@ -39,6 +39,16 @@ export const CURATED_CATEGORIES: Category[] = CURATED_LABELS.map((label) => ({
 const LABEL_BY_VALUE = new Map(CURATED_CATEGORIES.map((c) => [c.value, c.label]))
 const ORDER_BY_VALUE = new Map(CURATED_CATEGORIES.map((c, i) => [c.value, i]))
 
+/** Whether a value is one of the curated categories (always a valid landing page). */
+export function isCuratedCategory(value: string): boolean {
+  return LABEL_BY_VALUE.has(value)
+}
+
+/** A small set of popular categories for sitewide footer links. */
+export const POPULAR_CATEGORIES: Category[] = [
+  'portrait', 'wedding', 'film', 'moody', 'landscape', 'black-and-white', 'travel', 'vintage',
+].map((value) => ({ value, label: categoryLabel(value) }))
+
 /** Human label for a stored category value (curated label, else title-cased). */
 export function categoryLabel(value?: string | null): string {
   if (!value) return ''

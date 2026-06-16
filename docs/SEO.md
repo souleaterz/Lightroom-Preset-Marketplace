@@ -47,11 +47,11 @@ How to get found and rank for "lightroom presets", "free lightroom presets",
 
 ## 2. Content & keywords (the real ranking driver)
 
-- ⬜ **Category landing pages** with unique copy + indexable URLs, e.g.
-  `/presets/portrait`, `/presets/film`, `/presets/moody` (not just `?category=`
-  query params, which rank poorly). Target "portrait lightroom presets" etc.
-- ⬜ **Free presets hub** — a content-rich `/free-lightroom-presets` page (huge search
-  volume) beyond the current `/browse?free=1` filter.
+- ✅ **Category landing pages** — `/presets/[category]` with unique copy, indexable
+  URLs, ItemList JSON-LD, breadcrumb + cross-links, sitemap inclusion (used cats only),
+  and sitewide footer links. Targets "portrait lightroom presets" etc.
+- ✅ **Free presets hub** — `/free-lightroom-presets` content page (replaced the
+  `/browse?free=1` filter in the sitemap/footer).
 - ⬜ **Blog content calendar** targeting informational keywords that funnel to presets:
   "best lightroom presets for \<X\>", "how to install lightroom presets (desktop +
   mobile/DNG)", "what is a lightroom preset", style round-ups. Internally link to

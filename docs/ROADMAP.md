@@ -76,9 +76,11 @@ Full checklist + status in [`docs/SEO.md`](./SEO.md). Highest-leverage items:
 - ⬜ **BreadcrumbList JSON-LD** on preset/seller/category pages.
 
 ### Content & structure (ranking driver)
-- ⬜ **Category landing pages** with real URLs (`/presets/portrait`, …) + unique copy,
-  instead of `?category=` query params.
-- ⬜ **Free-presets content hub** (`/free-lightroom-presets`) — high search volume.
+- ✅ **Category landing pages** — `/presets/[category]` with unique H1/intro, preset
+  grid, ItemList JSON-LD, breadcrumb, cross-links; in sitemap (used categories only);
+  empty curated ones render noindex. Sitewide footer links to popular categories.
+- ✅ **Free-presets content hub** — `/free-lightroom-presets` (replaced the
+  `?free=1` sitemap entry). Footer link added.
 - ⬜ **Keyword-rich preset slugs** (`/preset/[id]/[slug]`) with 301s from old URLs.
 - ⬜ **Blog content calendar** ("best presets for X", install guides incl. DNG/mobile)
   internally linking to presets/categories.

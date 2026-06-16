@@ -4,14 +4,20 @@ import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Compass } from 'lucide-react'
+import { POPULAR_CATEGORIES } from '@/lib/categories'
 
 const LINKS: { heading: string; items: { label: string; href: string }[] }[] = [
   {
     heading: 'Marketplace',
     items: [
       { label: 'Browse Presets', href: '/browse' },
+      { label: 'Free Presets', href: '/free-lightroom-presets' },
       { label: 'Become a Seller', href: '/sell' },
     ],
+  },
+  {
+    heading: 'Categories',
+    items: POPULAR_CATEGORIES.map((c) => ({ label: c.label, href: `/presets/${c.value}` })),
   },
   {
     heading: 'Program',
@@ -47,7 +53,7 @@ export function Footer() {
           </div>
 
           {/* Link columns */}
-          <div className="grid grid-cols-2 gap-10 sm:gap-16">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 sm:gap-12">
             {LINKS.map((col) => (
               <div key={col.heading}>
                 <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
