@@ -100,19 +100,27 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Stripe Connect banner */}
-        {!seller?.stripe_account_id && (
+        {/* Stripe Connect banner — shows until the account is actually active.
+            Starting onboarding creates a stripe_account_id (status 'pending'), so
+            presence of an id alone doesn't mean payouts are enabled. */}
+        {seller?.stripe_account_status !== 'active' && (
           <div className="mb-6 flex items-start gap-4 p-5 bg-amber-500/10 border border-amber-500/20 rounded-xl">
             <AlertCircle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-amber-300">Connect Stripe to receive payouts</p>
+              <p className="text-sm font-medium text-amber-300">
+                {seller?.stripe_account_id
+                  ? 'Finish setting up Stripe to receive payouts'
+                  : 'Connect Stripe to receive payouts'}
+              </p>
               <p className="text-xs text-amber-400/70 mt-1">
-                Set up Stripe Connect to receive 90% of every sale directly to your bank account.
+                {seller?.stripe_account_id
+                  ? 'Your Stripe onboarding isn’t complete yet — until it is, you can’t receive payouts from sales.'
+                  : 'Set up Stripe Connect to receive 90% of every sale directly to your bank account.'}
               </p>
             </div>
             <a href="/api/stripe/connect/onboard">
               <Button size="sm" variant="outline" className="border-amber-500/30 text-amber-300 hover:bg-amber-500/10">
-                Connect Stripe
+                {seller?.stripe_account_id ? 'Continue setup' : 'Connect Stripe'}
               </Button>
             </a>
           </div>
