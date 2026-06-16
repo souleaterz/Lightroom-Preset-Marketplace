@@ -9,6 +9,10 @@ ordered roughly by impact-to-effort. Shipped items move to the bottom.
   `/api/claim`. "Free only" browse filter + `/browse?free=1` sitemap landing page.
 - **DNG support (Lightroom Mobile)** — `.dng` accepted in upload, surfaced in copy
   and compatibility, added to SEO keywords.
+- **Flexible categories** — dropped the fixed category CHECK (migration `0010`).
+  Sellers pick from a big curated list (`lib/categories.ts`) or type a custom one;
+  values are normalized slugs. Browse filter auto-builds from categories actually
+  used on published presets. *Next:* dedicated category landing pages (`/presets/<cat>`).
 - **Structured data** — `Product` + `Offer` + `AggregateRating` + `Review` JSON-LD
   on preset pages for Google rich results; sitemap already covers presets/blog.
 - **Preset bundles / packs** — a bundle is a `presets` row with `bundle_preset_ids`

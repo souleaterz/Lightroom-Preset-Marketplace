@@ -30,7 +30,7 @@ create table if not exists presets (
   title text not null,
   description text,
   price_cents integer not null check (price_cents >= 0),
-  category text check (category in ('portrait', 'landscape', 'street', 'film', 'moody', 'bright')),
+  category text, -- free-form; curated suggestions live in lib/categories.ts
   tags text[],
   before_image_url text not null,
   after_image_url text not null,

@@ -5,6 +5,17 @@ import { Navbar } from '@/components/Navbar'
 import { FilterSidebar } from '@/components/FilterSidebar'
 import { BrowseGrid } from './BrowseGrid'
 import { createClient } from '@/lib/supabase/server'
+import { toCategoryList, categoryLabel } from '@/lib/categories'
+
+async function getUsedCategories() {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('presets')
+    .select('category')
+    .eq('is_published', true)
+    .not('category', 'is', null)
+  return toCategoryList((data || []).map((r: { category: string | null }) => r.category))
+}
 
 export const metadata = {
   title: 'Browse Lightroom Presets',
@@ -20,6 +31,7 @@ export default async function BrowsePage({
 }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const categories = await getUsedCategories()
 
   return (
     <div className="min-h-screen">
@@ -29,14 +41,14 @@ export default async function BrowsePage({
           <h1 className="text-3xl font-semibold text-foreground">Browse Presets</h1>
           <p className="text-muted mt-1">
             {searchParams.category && searchParams.category !== 'all'
-              ? `${searchParams.category.charAt(0).toUpperCase() + searchParams.category.slice(1)} presets`
+              ? `${categoryLabel(searchParams.category)} presets`
               : 'All presets'}
           </p>
         </div>
 
         <div className="flex flex-col lg:flex-row lg:gap-8">
           <Suspense>
-            <FilterSidebar />
+            <FilterSidebar categories={categories} />
           </Suspense>
 
           <div className="flex-1 min-w-0">

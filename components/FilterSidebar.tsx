@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { SlidersHorizontal, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { CATEGORIES } from '@/types/database'
+import type { Category } from '@/lib/categories'
 import { cn } from '@/lib/utils'
 
 const SORT_OPTIONS = [
@@ -15,10 +15,13 @@ const SORT_OPTIONS = [
   { value: 'price_desc', label: 'Price: High–Low' },
 ]
 
-export function FilterSidebar() {
+export function FilterSidebar({ categories }: { categories: Category[] }) {
   const router = useRouter()
   const params = useSearchParams()
   const [open, setOpen] = useState(false)
+
+  // "All" plus the categories present on published presets.
+  const cats: Category[] = [{ value: 'all', label: 'All' }, ...categories]
 
   const category = params.get('category') || 'all'
   const minPrice = params.get('min_price') || '0'
@@ -93,7 +96,7 @@ export function FilterSidebar() {
       <div>
         <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">Category</h3>
         <div className="space-y-1">
-          {CATEGORIES.map((cat) => (
+          {cats.map((cat) => (
             <button
               key={cat.value}
               onClick={() => update('category', cat.value)}
@@ -204,7 +207,7 @@ export function FilterSidebar() {
             )}
           </Button>
 
-          {CATEGORIES.map((cat) => (
+          {cats.map((cat) => (
             <button
               key={cat.value}
               onClick={() => update('category', cat.value)}

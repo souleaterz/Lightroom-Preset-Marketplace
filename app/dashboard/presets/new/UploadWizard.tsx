@@ -7,18 +7,17 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
 import { UploadZone } from '@/components/UploadZone'
 import { BeforeAfterSlider } from '@/components/BeforeAfterSlider'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
 import { createUploadTargets, publishPreset, updatePreset } from './actions'
 import { cn } from '@/lib/utils'
+import { CURATED_CATEGORIES, categoryLabel, normalizeCategory } from '@/lib/categories'
 import type { Preset } from '@/types/database'
 
 const STEPS = ['Basics', 'Demo Images', 'Preset File', 'Review & Publish']
 const extOf = (name: string) => name.split('.').pop() || 'dat'
-const CATEGORIES = ['portrait', 'landscape', 'street', 'film', 'moody', 'bright']
 const COMPAT_OPTIONS = [
   'Lightroom Classic',
   'Lightroom CC (Desktop)',
@@ -62,7 +61,7 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
   const [data, setData] = useState<FormData>({
     title: existing?.title ?? '',
     description: existing?.description ?? '',
-    category: existing?.category ?? 'portrait',
+    category: existing?.category ? categoryLabel(existing.category) : 'Portrait',
     tags: existing?.tags ?? [],
     price: existing ? (existing.price_cents / 100).toString() : '',
     beforeImage: null,
@@ -118,6 +117,7 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
       if (!hasBefore || !hasAfter) throw new Error('Before/after images required')
       if (!hasFile) throw new Error('Preset file required')
       if (!data.title) throw new Error('Title required')
+      if (!normalizeCategory(data.category)) throw new Error('Category required')
       if (data.price === '' || isNaN(parseFloat(data.price)) || parseFloat(data.price) < 0)
         throw new Error('Valid price required (use 0 for free)')
 
@@ -260,9 +260,18 @@ export function UploadWizard({ existing }: { existing?: Preset }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="mb-1.5">Category *</Label>
-                <Select value={data.category} onChange={(e) => setData((d) => ({ ...d, category: e.target.value }))}>
-                  {CATEGORIES.map((c) => <option key={c} value={c} className="bg-surface">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
-                </Select>
+                <Input
+                  list="preset-categories"
+                  placeholder="Pick a suggestion or type your own"
+                  value={data.category}
+                  onChange={(e) => setData((d) => ({ ...d, category: e.target.value }))}
+                />
+                <datalist id="preset-categories">
+                  {CURATED_CATEGORIES.map((c) => (
+                    <option key={c.value} value={c.label} />
+                  ))}
+                </datalist>
+                <p className="text-xs text-muted mt-1.5">Choose a suggestion or add a new category.</p>
               </div>
               <div>
                 <Label className="mb-1.5">Price (£) *</Label>

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { normalizeCategory } from '@/lib/categories'
 import type { Preset } from '@/types/database'
 
 export interface CreateBundleInput {
@@ -70,7 +71,7 @@ export async function createBundle(
       seller_id: user.id,
       title: input.title.trim(),
       description: input.description,
-      category: input.category,
+      category: normalizeCategory(input.category) || null,
       tags: input.tags,
       price_cents: input.price_cents,
       before_image_url: first.before_image_url,

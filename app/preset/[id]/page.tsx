@@ -11,6 +11,7 @@ import { StarRating } from '@/components/StarRating'
 import { SellerBadge } from '@/components/SellerBadge'
 import { createClient } from '@/lib/supabase/server'
 import { formatDate, isDemoPreset, isFreePreset, isBundle } from '@/lib/utils'
+import { categoryLabel } from '@/lib/categories'
 import { Price } from '@/components/Price'
 import { siteConfig } from '@/lib/site'
 import type { Preset, Review, Purchase } from '@/types/database'
@@ -389,7 +390,7 @@ export default async function PresetPage({ params }: Props) {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   {preset.category && (
-                    <Badge variant="secondary" className="capitalize">{preset.category}</Badge>
+                    <Badge variant="secondary">{categoryLabel(preset.category)}</Badge>
                   )}
                   {bundle ? (
                     <Badge variant="outline" className="text-xs border-[#7c5cfc]/40 text-[#7c5cfc]">

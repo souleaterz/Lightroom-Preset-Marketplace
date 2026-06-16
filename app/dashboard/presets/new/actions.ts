@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { normalizeCategory } from '@/lib/categories'
 import { sendNewReleaseEmail } from '@/lib/email'
 
 export interface UploadTargetRequest {
@@ -101,7 +102,7 @@ export async function publishPreset(
       seller_id: user.id,
       title: input.title,
       description: input.description,
-      category: input.category,
+      category: normalizeCategory(input.category) || null,
       tags: input.tags,
       price_cents: input.price_cents,
       before_image_url: input.before_image_url,
@@ -154,7 +155,7 @@ export async function updatePreset(
     .update({
       title: input.title,
       description: input.description,
-      category: input.category,
+      category: normalizeCategory(input.category) || null,
       tags: input.tags,
       price_cents: input.price_cents,
       before_image_url: input.before_image_url,

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Star, Heart } from 'lucide-react'
 import { cn, isDemoPreset, isBundle } from '@/lib/utils'
+import { categoryLabel } from '@/lib/categories'
 import { SellerBadge } from '@/components/SellerBadge'
 import { Price } from '@/components/Price'
 import { useWishlist } from '@/components/WishlistProvider'
@@ -124,8 +125,8 @@ export function PresetCard({ preset, onQuickPreview, className }: PresetCardProp
             </span>
           )}
           {preset.category && (
-            <span className="text-xs font-medium text-muted bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded capitalize">
-              {preset.category}
+            <span className="text-xs font-medium text-muted bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded">
+              {categoryLabel(preset.category)}
             </span>
           )}
         </div>

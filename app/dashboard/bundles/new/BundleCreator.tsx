@@ -8,20 +8,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { cn, formatPrice } from '@/lib/utils'
+import { CURATED_CATEGORIES } from '@/lib/categories'
 import type { Preset } from '@/types/database'
 import { createBundle } from './actions'
-
-const CATEGORIES = ['portrait', 'landscape', 'street', 'film', 'moody', 'bright']
 
 export function BundleCreator({ presets }: { presets: Preset[] }) {
   const router = useRouter()
   const [selected, setSelected] = useState<string[]>([])
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [category, setCategory] = useState('portrait')
+  const [category, setCategory] = useState('Portrait')
   const [tags, setTags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState('')
   const [price, setPrice] = useState('')
@@ -139,11 +137,17 @@ export function BundleCreator({ presets }: { presets: Preset[] }) {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="mb-1.5">Category *</Label>
-            <Select value={category} onChange={(e) => setCategory(e.target.value)}>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c} className="bg-surface">{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+            <Input
+              list="bundle-categories"
+              placeholder="Pick a suggestion or type your own"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            />
+            <datalist id="bundle-categories">
+              {CURATED_CATEGORIES.map((c) => (
+                <option key={c.value} value={c.label} />
               ))}
-            </Select>
+            </datalist>
           </div>
           <div>
             <Label className="mb-1.5">Bundle price (£) *</Label>
