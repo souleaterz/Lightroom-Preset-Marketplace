@@ -30,20 +30,20 @@ export default async function ManagePresetsPage() {
     <div className="min-h-screen">
       <Navbar user={user} />
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-semibold text-foreground">My Presets</h1>
             <p className="text-muted mt-1">{presets.length} preset{presets.length !== 1 ? 's' : ''}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/dashboard/bundles/new">
-              <Button variant="outline">
+            <Link href="/dashboard/bundles/new" className="flex-1 sm:flex-none">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <Package className="h-4 w-4" />
                 New Bundle
               </Button>
             </Link>
-            <Link href="/dashboard/presets/new">
-              <Button>
+            <Link href="/dashboard/presets/new" className="flex-1 sm:flex-none">
+              <Button className="w-full sm:w-auto">
                 <Plus className="h-4 w-4" />
                 New Preset
               </Button>

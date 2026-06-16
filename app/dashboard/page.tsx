@@ -79,20 +79,20 @@ export default async function DashboardPage() {
     <div className="min-h-screen">
       <Navbar user={user} />
       <div className="max-w-7xl mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-semibold text-foreground">Dashboard</h1>
             <p className="text-muted mt-1">Welcome back, {seller?.display_name || seller?.username}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/dashboard/codes">
-              <Button variant="outline">
+            <Link href="/dashboard/codes" className="flex-1 sm:flex-none">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <Tag className="h-4 w-4" />
                 Discount Codes
               </Button>
             </Link>
-            <Link href="/dashboard/presets/new">
-              <Button>
+            <Link href="/dashboard/presets/new" className="flex-1 sm:flex-none">
+              <Button className="w-full sm:w-auto">
                 <Plus className="h-4 w-4" />
                 New Preset
               </Button>
