@@ -32,7 +32,7 @@ async function getPreset(id: string) {
   // owner's own (draft) presets, so sellers can preview their drafts.
   const { data } = await supabase
     .from('presets')
-    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, bio, total_sales, is_verified)')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, bio, total_sales, is_verified, is_founder)')
     .eq('id', id)
     .single()
   return data as Preset | null
@@ -53,7 +53,7 @@ async function getBundleItems(ids: string[]) {
   const supabase = createClient()
   const { data } = await supabase
     .from('presets')
-    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, is_verified, total_sales)')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, is_verified, is_founder, total_sales)')
     .in('id', ids)
   // Preserve the seller's chosen ordering.
   const rows = (data as Preset[]) || []
@@ -64,7 +64,7 @@ async function getRelated(preset: Preset) {
   const supabase = createClient()
   const { data } = await supabase
     .from('presets')
-    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, is_verified, total_sales)')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, is_verified, is_founder, total_sales)')
     .eq('is_published', true)
     .eq('category', preset.category || '')
     .neq('id', preset.id)

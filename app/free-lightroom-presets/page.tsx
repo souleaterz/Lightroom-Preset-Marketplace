@@ -29,7 +29,7 @@ async function getFreePresets(): Promise<Preset[]> {
   const supabase = createClient()
   const { data } = await supabase
     .from('presets')
-    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, is_verified, total_sales)')
+    .select('*, profiles!presets_seller_id_fkey(id, username, display_name, avatar_url, is_verified, is_founder, total_sales)')
     .eq('is_published', true)
     .eq('price_cents', 0)
     .order('created_at', { ascending: false })

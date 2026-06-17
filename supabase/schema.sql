@@ -12,6 +12,7 @@ create table if not exists profiles (
   stripe_account_status text check (stripe_account_status in ('pending', 'active', 'restricted')),
   is_seller boolean default false,
   is_verified boolean default false,
+  is_founder boolean default false,
   is_affiliate boolean default false,
   affiliate_code text,
   referred_by uuid references profiles(id),

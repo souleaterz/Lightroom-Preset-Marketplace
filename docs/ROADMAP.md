@@ -39,6 +39,10 @@ ordered roughly by impact-to-effort. Shipped items move to the bottom.
   6h cache + static fallback), `CurrencyProvider` / `Price` / `CurrencySwitcher`.
   Dashboards/payouts/earnings stay GBP (real settled money). *Future:* true local
   charging = enable Stripe Adaptive Pricing (dashboard toggle) + small checkout tweak.
+- **Founder badge + go-to-market** — `profiles.is_founder` (migration `0011`, manual)
+  drives a purple Founder badge (ranks above Verified) for early creators. `/sell`
+  copy sharpened for cold outreach (no-exclusivity objection, Founder perk).
+  Seller-recruitment playbook in `docs/SELLER-OUTREACH.md`.
 - **Verified / top-seller badges** — `profiles.is_verified` (migration `0008`, manual
   admin flag) drives a blue Verified badge; "Top Seller" is automatic at
   `TOP_SELLER_MIN_SALES` (50) sales. `components/SellerBadge.tsx` +

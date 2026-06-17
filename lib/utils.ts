@@ -30,16 +30,18 @@ export function isBundle(preset: { bundle_preset_ids?: string[] | null }): boole
 /** Sales threshold at which a seller earns the automatic "Top Seller" badge. */
 export const TOP_SELLER_MIN_SALES = 50
 
-export type SellerBadgeType = 'verified' | 'top'
+export type SellerBadgeType = 'founder' | 'verified' | 'top'
 
 /**
- * The trust badge a seller has earned, if any. Manual verification outranks the
- * automatic top-seller tier. Computed from fields present on the profiles join.
+ * The trust badge a seller has earned, if any. Founding creators rank highest,
+ * then manual verification, then the automatic top-seller tier. Computed from
+ * fields present on the profiles join.
  */
 export function getSellerBadge(
-  profile?: { is_verified?: boolean | null; total_sales?: number | null } | null
+  profile?: { is_founder?: boolean | null; is_verified?: boolean | null; total_sales?: number | null } | null
 ): SellerBadgeType | null {
   if (!profile) return null
+  if (profile.is_founder) return 'founder'
   if (profile.is_verified) return 'verified'
   if ((profile.total_sales ?? 0) >= TOP_SELLER_MIN_SALES) return 'top'
   return null

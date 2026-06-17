@@ -37,7 +37,7 @@ const BENEFITS = [
   { icon: Sparkles, title: 'Fee-free first month', desc: 'Pay 0% for your first 30 days — your earliest sales are entirely yours to keep.' },
   { icon: Wallet, title: 'Automatic payouts', desc: 'Connect Stripe once and earnings land in your bank account after every sale.' },
   { icon: Eye, title: 'Previews that sell', desc: 'Every listing ships with a live before/after slider on real photos — buyers see exactly what they get.' },
-  { icon: SlidersHorizontal, title: 'Your prices, your rules', desc: 'Set and change your prices anytime. No subscriptions, no lock-in, no minimums.' },
+  { icon: SlidersHorizontal, title: 'Your prices, no lock-in', desc: 'Set and change prices anytime. No subscriptions and no exclusivity — keep selling wherever else you do.' },
   { icon: Users, title: 'No audience needed', desc: 'Buyers discover presets through the marketplace — you don’t need a big following to start earning.' },
 ]
 
@@ -54,6 +54,7 @@ const FAQ = [
   { q: 'How do I get paid?', a: `Connect your Stripe account once and payouts land in your bank automatically after each sale. You keep ${creatorShare}%.` },
   { q: 'Do I need a big following?', a: 'No. Buyers discover presets through our marketplace, and your live before/after previews do the selling for you.' },
   { q: 'Can I set my own prices?', a: 'Yes — you have full control over pricing for every preset and pack, and you can change it anytime.' },
+  { q: 'Do I have to sell exclusively here?', a: 'No. PresetScout isn’t exclusive — you’re free to keep selling the same presets on your own site or anywhere else. There’s nothing to lose by listing here too.' },
   { q: 'How quickly can I start?', a: 'Minutes. Create a free account, upload a preset with a before/after, set a price, and publish.' },
 ]
 
@@ -114,7 +115,7 @@ export default async function SellPage() {
           <div className="text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#7c5cfc]/10 border border-[#7c5cfc]/20 text-sm text-[#cbb9ff] mb-7 backdrop-blur-sm">
               <Sparkles className="h-3.5 w-3.5" />
-              Founding creators: 0% fees for your first month
+              Founding creators get a Founder badge + 0% fees for the first month
             </div>
             <h1 className="font-serif text-5xl sm:text-6xl lg:text-[4.75rem] leading-[1.03] text-foreground mb-6">
               Sell your presets.{' '}
@@ -122,11 +123,13 @@ export default async function SellPage() {
             </h1>
             <p className="text-lg text-muted max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
               Turn the look people already love into income. List in minutes, set your own prices,
-              and let live before/after previews sell for you — with payouts straight to your bank.
+              and keep <span className="text-foreground font-semibold">{creatorShare}%</span> of every sale
+              with instant payouts. Already sell elsewhere? Keep doing it — PresetScout isn’t exclusive,
+              so there’s nothing to lose.
             </p>
             <Cta />
             <div className="mt-9 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm text-muted">
-              {['Free to list', '0% fees first month', 'Instant Stripe payouts'].map((t) => (
+              {['Free to list', '0% fees first month', 'Instant Stripe payouts', 'No exclusivity'].map((t) => (
                 <span key={t} className="inline-flex items-center gap-2">
                   <Check className="h-4 w-4 text-[#7c5cfc]" />
                   {t}
