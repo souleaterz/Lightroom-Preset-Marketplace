@@ -42,6 +42,15 @@ Drop a relevant blog post in the DM rather than pitching:
 ### D) Warm / personal network
 > Hey [name]! I finally launched the presets marketplace I've been building — PresetScout. You've got a great eye; would you be up for being one of the first creators? You keep 90%, get paid instantly, it's free to list, and I'll set everything up with you. You'd get a Founder badge too. Fancy giving it a go?
 
+### F) Fiverr preset creators — strong target (passive income angle)
+> NOTE: reach them via their linked Instagram/portfolio/website, NOT Fiverr's
+> inbox (Fiverr bans off-platform solicitation).
+
+> Hi [name] — I came across your preset work and it’s genuinely impressive. Quick thought: right now you’re making presets one client at a time, but that same skill could earn while you sleep. I run **PresetScout**, a marketplace just for Lightroom presets — you package a pack once and sell it over and over. Creators keep **90%** (vs the 20% Fiverr takes from you), get **instant Stripe payouts**, and it’s free and **not exclusive**, so keep your gigs running too. As an early creator you’d also get a **Founder badge**. Happy to set your first pack up with you — want me to? presetscout.com/sell
+
+Short version (for DMs with character limits):
+> Love your preset work! You make these one client at a time — on **PresetScout** you’d package a pack once and sell it on repeat, keep **90%** (Fiverr takes 20%), instant payouts, free + not exclusive. Early creators get a Founder badge. Want me to help you list your first pack? presetscout.com/sell
+
 ### E) Follow-up (2–3 days later, if no reply)
 > Hey [name], no worries if it's not for you — just offering to do the heavy lifting: send me your presets + a couple of before/after photos and I'll have your shop live today (you keep 90%). Either way, love your work!
 
