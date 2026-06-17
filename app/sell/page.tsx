@@ -22,19 +22,19 @@ const creatorShare = 100 - PLATFORM_FEE_PERCENT // 90
 
 export const metadata: Metadata = {
   title: 'Sell Lightroom Presets',
-  description: `Sell your Lightroom presets on PresetScout and keep ${creatorShare}% of every sale. Free to list, fee-free first month, automatic Stripe payouts, and live before/after previews that sell for you.`,
+  description: `Sell your Lightroom presets on PresetScout and keep ${creatorShare}% of every sale. Free to list, one flat ${PLATFORM_FEE_PERCENT}% fee with no hidden costs, automatic Stripe payouts, and live before/after previews that sell for you.`,
   alternates: { canonical: '/sell' },
   openGraph: {
     type: 'website',
     title: `Sell Lightroom Presets | ${siteConfig.name}`,
-    description: `Keep ${creatorShare}% of every sale. Free to list, fee-free first month, instant Stripe payouts.`,
+    description: `Keep ${creatorShare}% of every sale. Free to list, one flat ${PLATFORM_FEE_PERCENT}% fee, instant Stripe payouts.`,
     url: `${siteConfig.url}/sell`,
   },
 }
 
 const BENEFITS = [
   { icon: DollarSign, title: `Keep ${creatorShare}%`, desc: 'One flat 10% fee — no listing fees, no ad surcharges, no monthly costs. Once you add those up elsewhere, you keep more here.' },
-  { icon: Sparkles, title: 'Fee-free first month', desc: 'Pay 0% for your first 30 days — your earliest sales are entirely yours to keep.' },
+  { icon: Sparkles, title: 'Founder badge for early creators', desc: 'Join now and earn a Founder badge on your shop and listings — recognition as one of our first creators.' },
   { icon: Wallet, title: 'Automatic payouts', desc: 'Connect Stripe once and earnings land in your bank account after every sale.' },
   { icon: Eye, title: 'Previews that sell', desc: 'Every listing ships with a live before/after slider on real photos — buyers see exactly what they get.' },
   { icon: SlidersHorizontal, title: 'Your prices, no lock-in', desc: 'Set and change prices anytime. No subscriptions and no exclusivity — keep selling wherever else you do.' },
@@ -50,7 +50,7 @@ const STEPS = [
 
 const FAQ = [
   { q: 'What can I sell?', a: 'Lightroom presets in any common format — .xmp, .lrtemplate, DNG, or a zipped pack. Desktop and mobile presets are both welcome.' },
-  { q: 'How much does it cost?', a: `Nothing to join or list. We take one flat ${PLATFORM_FEE_PERCENT}% per sale — no listing fees, no ad surcharges and no monthly costs, so it works out cheaper than marketplaces like Etsy once their extras stack up. And your first month is completely fee-free, so you keep 100% to start.` },
+  { q: 'How much does it cost?', a: `Nothing to join or list. We take one flat ${PLATFORM_FEE_PERCENT}% per sale — no listing fees, no ad surcharges and no monthly costs, so it works out cheaper than marketplaces like Etsy once their extras stack up.` },
   { q: 'How do I get paid?', a: `Connect your Stripe account once and payouts land in your bank automatically after each sale. You keep ${creatorShare}%.` },
   { q: 'Do I need a big following?', a: 'No. Buyers discover presets through our marketplace, and your live before/after previews do the selling for you.' },
   { q: 'Can I set my own prices?', a: 'Yes — you have full control over pricing for every preset and pack, and you can change it anytime.' },
@@ -115,7 +115,7 @@ export default async function SellPage() {
           <div className="text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#7c5cfc]/10 border border-[#7c5cfc]/20 text-sm text-[#cbb9ff] mb-7 backdrop-blur-sm">
               <Sparkles className="h-3.5 w-3.5" />
-              Founding creators get a Founder badge + 0% fees for the first month
+              Founding creators get a Founder badge
             </div>
             <h1 className="font-serif text-5xl sm:text-6xl lg:text-[4.75rem] leading-[1.03] text-foreground mb-6">
               Sell your presets.{' '}
@@ -129,7 +129,7 @@ export default async function SellPage() {
             </p>
             <Cta />
             <div className="mt-9 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm text-muted">
-              {['Free to list', '0% fees first month', 'Instant Stripe payouts', 'No exclusivity'].map((t) => (
+              {['Free to list', `Keep ${creatorShare}%`, 'Instant Stripe payouts', 'No exclusivity'].map((t) => (
                 <span key={t} className="inline-flex items-center gap-2">
                   <Check className="h-4 w-4 text-[#7c5cfc]" />
                   {t}
@@ -222,7 +222,7 @@ export default async function SellPage() {
             </div>
             <div className="border-t border-line mt-6 pt-5 flex items-center gap-3 text-sm text-muted">
               <ShieldCheck className="h-5 w-5 text-[#7c5cfc] flex-shrink-0" />
-              On a £10 preset you keep <span className="text-foreground font-semibold">£{(creatorShare / 10).toFixed(2)}</span> — and £10.00 during your fee-free first month.
+              On a £10 preset you keep <span className="text-foreground font-semibold">£{(creatorShare / 10).toFixed(2)}</span> — straight to your bank.
             </div>
             <div className="border-t border-line mt-5 pt-5">
               <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">What we don’t charge</p>
@@ -274,7 +274,7 @@ export default async function SellPage() {
               </h2>
               <p className="text-muted text-lg max-w-xl mx-auto mb-8">
                 Join free, list your first preset today, and keep {creatorShare}% of every sale —
-                100% for your first month.
+                one flat fee, no hidden costs.
               </p>
               <div className="flex justify-center">
                 <Cta centered />

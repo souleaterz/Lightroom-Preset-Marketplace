@@ -120,9 +120,7 @@ export async function publishPreset(
 
   if (error) return { error: error.message }
 
-  // Start the new-creator fee-free window on first publish (only sets it once).
   if (input.is_published) {
-    await startFeeWaiver(admin, user.id)
     await notifyFollowersOfNewRelease(admin, user.id, data.id as string, input.title)
   }
 
@@ -173,7 +171,6 @@ export async function updatePreset(
   if (error) return { error: error.message }
 
   if (input.is_published) {
-    await startFeeWaiver(admin, user.id)
     await notifyFollowersOfNewRelease(admin, user.id, input.id, input.title)
   }
 
@@ -220,14 +217,4 @@ async function notifyFollowersOfNewRelease(admin: any, sellerId: string, presetI
   } catch (err) {
     console.error('notifyFollowersOfNewRelease failed:', err)
   }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function startFeeWaiver(admin: any, userId: string) {
-  const waiverUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-  await admin
-    .from('profiles')
-    .update({ fee_waiver_until: waiverUntil })
-    .eq('id', userId)
-    .is('fee_waiver_until', null)
 }

@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     // Get preset + seller
     const { data: preset } = await supabase
       .from('presets')
-      .select('*, profiles!presets_seller_id_fkey(id, stripe_account_id, stripe_account_status, fee_waiver_until)')
+      .select('*, profiles!presets_seller_id_fkey(id, stripe_account_id, stripe_account_status)')
       .eq('id', preset_id)
       .eq('is_published', true)
       .single()
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     }
 
     const seller = (preset as Record<string, unknown> & {
-      profiles?: { stripe_account_id?: string; stripe_account_status?: string; fee_waiver_until?: string | null }
+      profiles?: { stripe_account_id?: string; stripe_account_status?: string }
     }).profiles
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
@@ -71,9 +71,7 @@ export async function POST(request: Request) {
       discountCodeId = discount.code!.id
     }
 
-    // New creators are fee-free during their waiver window.
-    const feeFree = !!seller?.fee_waiver_until && new Date(seller.fee_waiver_until).getTime() > Date.now()
-    const feeAmount = feeFree ? 0 : Math.round(unitAmount * (PLATFORM_FEE_PERCENT / 100))
+    const feeAmount = Math.round(unitAmount * (PLATFORM_FEE_PERCENT / 100))
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
@@ -97,7 +95,6 @@ export async function POST(request: Request) {
     }
 
     // Add Stripe Connect transfer if seller has active account.
-    // Omit application_fee_amount entirely when fee-free (Stripe rejects 0).
     if (seller?.stripe_account_id && seller?.stripe_account_status === 'active') {
       sessionParams.payment_intent_data = {
         transfer_data: { destination: seller.stripe_account_id },

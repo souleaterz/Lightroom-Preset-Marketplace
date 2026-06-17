@@ -5,7 +5,6 @@ selling **economics + zero risk + white-glove help**. Personalise every message.
 
 ## The pitch (lead with these)
 - Keep **90%** of every sale — **one flat 10% fee**, no listing fees, no ad surcharges, no monthly costs (cheaper than Etsy once their extras stack up).
-- **0% fees for your first month.**
 - **Instant Stripe payouts**, straight to their bank.
 - **Free to list, not exclusive** — keep selling elsewhere too.
 - Live **before/after previews** that convert.
@@ -32,7 +31,7 @@ Drop a relevant blog post in the DM rather than pitching:
 ## Templates (personalise line 1 every time)
 
 ### A) Creators already selling presets (Etsy / Gumroad / Sellfy) — highest conversion
-> Hey [name] — love your [specific pack/style] presets. I run **PresetScout**, a marketplace built only for Lightroom presets. Creators keep **90%** (vs the cut you're probably giving up now), get **instant Stripe payouts**, and pay **no fees the first month**. It's free and **not exclusive** — keep your existing shop too. As one of our first creators you'd also get a **Founder badge**. Want me to upload your pack for you? Takes 10 mins: presetscout.com/sell
+> Hey [name] — love your [specific pack/style] presets. I run **PresetScout**, a marketplace built only for Lightroom presets. Creators keep **90%** (vs the cut you're probably giving up now), get **instant Stripe payouts**, and pay just **one flat 10% fee** (no listing or hidden costs). It's free and **not exclusive** — keep your existing shop too. As one of our first creators you'd also get a **Founder badge**. Want me to upload your pack for you? Takes 10 mins: presetscout.com/sell
 
 ### B) Instagram / TikTok photographers with a signature look
 > Hey [name] — your [e.g. warm film-style beach edits] are stunning, that look is genuinely sellable. I just launched **PresetScout** (a marketplace just for Lightroom presets). You'd keep **90%**, get **instant payouts**, and every listing has a live before/after slider so buyers see the look on real photos. Free + not exclusive, and you'd get a **Founder badge** as an early creator. Happy to help you package your first pack — want me to walk you through it? presetscout.com/sell

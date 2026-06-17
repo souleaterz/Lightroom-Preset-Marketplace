@@ -23,10 +23,6 @@ export const AFFILIATE_FEE_PERCENT = parseInt(
   10
 )
 
-// New creators pay no platform fee for this many days after their first
-// published preset.
-export const NEW_CREATOR_FEE_FREE_DAYS = 30
-
 export function formatCents(cents: number): string {
   return new Intl.NumberFormat('en-GB', {
     style: 'currency',

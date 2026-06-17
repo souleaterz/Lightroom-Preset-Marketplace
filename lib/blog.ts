@@ -171,7 +171,7 @@ export const POSTS: BlogPost[] = [
       { type: 'h2', text: 'Step 4 — Keep more of what you earn' },
       {
         type: 'p',
-        text: 'On PresetScout you keep **90% of every sale**, get paid directly through Stripe, and pay **zero fees for your first month**. List for free and start selling the same day.',
+        text: 'On PresetScout you keep **90% of every sale** with **one flat 10% fee** — no listing fees or hidden costs — and get paid directly through Stripe. List for free and start selling the same day.',
       },
       {
         type: 'quote',
@@ -258,7 +258,7 @@ export const POSTS: BlogPost[] = [
       { type: 'h2', text: 'Step 5 — Turn your presets into income' },
       {
         type: 'p',
-        text: 'Once your pack is ready, you can list it in minutes. On PresetScout you keep **90% of every sale**, pay **zero fees for your first month**, and get paid directly through Stripe. [Start selling on PresetScout](/sell), then [upload your first preset](/dashboard/presets/new) with real before/after previews so buyers see exactly what they’re getting.',
+        text: 'Once your pack is ready, you can list it in minutes. On PresetScout you keep **90% of every sale** — one flat 10% fee with no listing or hidden costs — and get paid directly through Stripe. [Start selling on PresetScout](/sell), then [upload your first preset](/dashboard/presets/new) with real before/after previews so buyers see exactly what they’re getting.',
       },
       {
         type: 'p',
@@ -310,7 +310,7 @@ export const POSTS: BlogPost[] = [
       { type: 'h2', text: 'What you actually keep (fees matter a lot)' },
       {
         type: 'p',
-        text: 'Headline price isn’t take-home. Many platforms take 30–50% or charge listing fees. On [PresetScout](/sell) you keep **90% of every sale**, pay **no platform fee for your first month**, and receive payouts straight to your bank via Stripe. On £900 of sales that 90% vs, say, 60% split is the difference between £810 and £540 in your pocket.',
+        text: 'Headline price isn’t take-home. Many platforms take 30–50% or pile on listing and ad fees. On [PresetScout](/sell) you keep **90% of every sale** — one flat 10% fee with no hidden costs — and receive payouts straight to your bank via Stripe. On £900 of sales that 90% vs, say, 60% split is the difference between £810 and £540 in your pocket.',
       },
       { type: 'h2', text: 'What separates the earners from the rest' },
       {
@@ -378,14 +378,14 @@ export const POSTS: BlogPost[] = [
       { type: 'h3', text: 'PresetScout — built specifically for presets' },
       {
         type: 'p',
-        text: 'A focused marketplace where every listing has a live before/after slider, buyers are there specifically for Lightroom presets, and you keep **90% of every sale** with **no fees for your first month** and instant Stripe payouts. You can [browse the marketplace](/browse) to see how listings look, then [start selling](/sell) in minutes.',
+        text: 'A focused marketplace where every listing has a live before/after slider, buyers are there specifically for Lightroom presets, and you keep **90% of every sale** with **one flat 10% fee** (no listing or ad fees) and instant Stripe payouts. You can [browse the marketplace](/browse) to see how listings look, then [start selling](/sell) in minutes.',
       },
       { type: 'h2', text: 'A quick fee reality check' },
       {
         type: 'ul',
         items: [
           'Keep **90%** on PresetScout vs the 50–70% common elsewhere.',
-          '**Zero** platform fees in your first month — list and sell the same day.',
+          '**One flat 10%** fee — no listing fees, ad surcharges or monthly costs.',
           'Instant payouts via Stripe, straight to your bank.',
         ],
       },
