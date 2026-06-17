@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 }
 
 const BENEFITS = [
-  { icon: DollarSign, title: `Keep ${creatorShare}%`, desc: 'A flat 10% fee, nothing hidden. You keep the lion’s share of every single sale.' },
+  { icon: DollarSign, title: `Keep ${creatorShare}%`, desc: 'One flat 10% fee — no listing fees, no ad surcharges, no monthly costs. Once you add those up elsewhere, you keep more here.' },
   { icon: Sparkles, title: 'Fee-free first month', desc: 'Pay 0% for your first 30 days — your earliest sales are entirely yours to keep.' },
   { icon: Wallet, title: 'Automatic payouts', desc: 'Connect Stripe once and earnings land in your bank account after every sale.' },
   { icon: Eye, title: 'Previews that sell', desc: 'Every listing ships with a live before/after slider on real photos — buyers see exactly what they get.' },
@@ -50,7 +50,7 @@ const STEPS = [
 
 const FAQ = [
   { q: 'What can I sell?', a: 'Lightroom presets in any common format — .xmp, .lrtemplate, DNG, or a zipped pack. Desktop and mobile presets are both welcome.' },
-  { q: 'How much does it cost?', a: `Nothing to join or list. We take a flat ${PLATFORM_FEE_PERCENT}% per sale — and your first month is completely fee-free, so you keep 100% to start.` },
+  { q: 'How much does it cost?', a: `Nothing to join or list. We take one flat ${PLATFORM_FEE_PERCENT}% per sale — no listing fees, no ad surcharges and no monthly costs, so it works out cheaper than marketplaces like Etsy once their extras stack up. And your first month is completely fee-free, so you keep 100% to start.` },
   { q: 'How do I get paid?', a: `Connect your Stripe account once and payouts land in your bank automatically after each sale. You keep ${creatorShare}%.` },
   { q: 'Do I need a big following?', a: 'No. Buyers discover presets through our marketplace, and your live before/after previews do the selling for you.' },
   { q: 'Can I set my own prices?', a: 'Yes — you have full control over pricing for every preset and pack, and you can change it anytime.' },
@@ -223,6 +223,21 @@ export default async function SellPage() {
             <div className="border-t border-line mt-6 pt-5 flex items-center gap-3 text-sm text-muted">
               <ShieldCheck className="h-5 w-5 text-[#7c5cfc] flex-shrink-0" />
               On a £10 preset you keep <span className="text-foreground font-semibold">£{(creatorShare / 10).toFixed(2)}</span> — and £10.00 during your fee-free first month.
+            </div>
+            <div className="border-t border-line mt-5 pt-5">
+              <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">What we don’t charge</p>
+              <div className="grid sm:grid-cols-3 gap-3 text-sm">
+                {['No listing fees', 'No ad surcharges', 'No monthly subscription'].map((t) => (
+                  <span key={t} className="inline-flex items-center gap-2 text-muted">
+                    <Check className="h-4 w-4 text-[#7c5cfc] flex-shrink-0" />
+                    {t}
+                  </span>
+                ))}
+              </div>
+              <p className="text-xs text-muted mt-4">
+                Marketplaces like Etsy add per-item listing fees, payment surcharges and Offsite-Ads cuts on top —
+                which often pushes their real take well above ours.
+              </p>
             </div>
           </div>
         </div>

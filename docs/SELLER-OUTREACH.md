@@ -4,7 +4,7 @@ Goal: hand-recruit the first 5–10 sellers. You're not selling traffic yet — 
 selling **economics + zero risk + white-glove help**. Personalise every message.
 
 ## The pitch (lead with these)
-- Keep **90%** of every sale (flat 10% fee).
+- Keep **90%** of every sale — **one flat 10% fee**, no listing fees, no ad surcharges, no monthly costs (cheaper than Etsy once their extras stack up).
 - **0% fees for your first month.**
 - **Instant Stripe payouts**, straight to their bank.
 - **Free to list, not exclusive** — keep selling elsewhere too.
