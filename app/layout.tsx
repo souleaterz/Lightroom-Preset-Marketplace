@@ -7,6 +7,7 @@ import { ThemeScript } from '@/components/ThemeScript'
 import { Footer } from '@/components/Footer'
 import { siteConfig } from '@/lib/site'
 import { getRates, currencyForCountry, isCurrencyCode } from '@/lib/currency'
+import { Analytics } from '@vercel/analytics/next'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -95,6 +96,7 @@ export default async function RootLayout({
             <Footer />
           </WishlistProvider>
         </CurrencyProvider>
+        <Analytics />
       </body>
     </html>
   )
